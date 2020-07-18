@@ -17,7 +17,6 @@ const propertiesToWatch = ['stroke','fill'];
 * Use {@link object.set} with forceHistory if unwatched property is set thorugh code
 */
 function fabricAddUndoRedo(properties) {
-
     if (0 !== fabric.Canvas.prototype.id) {
 	fabricAddObjectIDs();
     }
