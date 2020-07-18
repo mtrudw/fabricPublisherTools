@@ -20,12 +20,22 @@ function fabricAddUndoRedo(properties) {
     if (0 !== fabric.Canvas.prototype.id) {
 	fabricAddObjectIDs();
     }
+
+    if (fabric.Canvas.prototype._undoRedoAttached) {
+	if  (properties) {
+	    fabric.Object.prototype.historyWatch =properties;
+	} else {
+	    fabric.Object.prototype.historyWatch = propertiesToWatch;
+	}
+	return;
+    }
+    
+    fabric.Canvas.prototype._undoRedoAttached = true;
     fabric.Canvas.prototype.historyStack = [];
     fabric.Canvas.prototype.redoStack = [];
     fabric.Canvas.prototype.recordHistory = true;
     fabric.Canvas.prototype.redoing = false;
 
-    fabric.Object.prototype.historyWatch = propertiesToWatch;
     if  (properties) {
 	fabric.Object.prototype.historyWatch =properties;
     } else {
