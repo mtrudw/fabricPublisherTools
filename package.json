@@ -10,6 +10,7 @@
       "@rollup/plugin-node-resolve": "^8.4.0",
       "babel-jest": "^26.1.0",
       "jest": "^26.1.0",
+      "jsdoc": "^3.6.4",
       "rollup": "^2.21.0",
       "rollup-plugin-serve": "^1.0.2"
    },
@@ -20,6 +21,7 @@
    "scripts": {
       "build": "rollup -c",
       "start": "rollup -c -w",
-      "test": "jest"
+       "test": "jest",
+       "doc" : "jsdoc src -r -d docs"
    }
 }

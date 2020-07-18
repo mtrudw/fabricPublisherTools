@@ -1,5 +1,11 @@
 import { fabric } from 'fabric';
 
+/**
+* Adds a unique id to every object added to a canvas and 
+* provides a function to retrieve an object by its id.
+* Ids are exported to JSON and stay consistent during load.
+*
+**/
 function fabricAddObjectIDs() {
     fabric.Canvas.prototype.id = 0;
 
@@ -26,6 +32,15 @@ function fabricAddObjectIDs() {
 	};
     })(fabric.Object.prototype.toObject);
 
+
+    /** 
+     * Function of every new fabric.Canvas. 
+     * Returns the fabric object with a given id, return null if no object matching the id is found
+     *
+     * @function getObjectById
+     * @param {int} id 
+     * id to look for
+     */
     fabric.Canvas.prototype.getObjectById = function(id) {
 	var object = null,
 	    objects = this.getObjects();

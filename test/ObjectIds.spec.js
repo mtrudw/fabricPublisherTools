@@ -1,5 +1,5 @@
 import {fabric} from 'fabric';
-import {fabricAddObjectIDs} from '../src/ObjectIds.js';
+import {fabricAddObjectIDs} from '../src/index.js';
 
 var canvas;
 
@@ -40,6 +40,7 @@ test('find Object by Id', () => {
 
     expect(canvas.getObjectById(rect1.id)).toBe(rect1);
     expect(canvas.getObjectById(rect2.id)).toBe(rect2);
+    expect(canvas.getObjectById(5)).toBeNull();
 });
 
 test('export Ids',() => {
