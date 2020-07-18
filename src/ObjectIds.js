@@ -13,7 +13,7 @@ function fabricAddObjectIDs() {
     fabric.Canvas.prototype.add = (function(originalFn) {
 	return function(...args) {
 	    args.forEach(obj => {
-		if (!obj.id) {
+		if (null == obj.id) {
 		    obj.id = this.id++;
 		}
 	    });
