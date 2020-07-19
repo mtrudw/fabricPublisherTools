@@ -1,13 +1,19 @@
 import {fabric} from 'fabric';
+import {fabricAddObjectIDs} from './ObjectIds.js'
 
 function fabricAddSnapper() {
+    
     if (fabric.Canvas.prototype._snapperAttached) {
 	return;
+    }
+    if (0 !== fabric.Canvas.prototype.id) {
+	fabricAddObjectIDs();
     }
 
     fabric.Canvas.prototype._snapperAttached = true;
     fabric.Canvas.prototype.snapPoints =[];
     fabric.Object.prototype.snapMargin =4;
+    fabric.Object.prototype.lastValidBounds = null;
 
     fabric.Object.prototype.getBoundingCoords = function(calc) {
 	var tempStroke = this.strokeWidth;
@@ -34,11 +40,15 @@ function fabricAddSnapper() {
 	    cos2t = fabric.util.cos(2*theta),
 	    boundHeight = coords.bottom-coords.top,
 	    boundWidth = coords.right-coords.left;
-	
-	this.scaleX = (boundHeight*cos-boundWidth*sin)/cos2t / this.width;
-	this.scaleY = (boundWidth*cos-boundHeight*sin)/cos2t / this.width;
+	var tempStroke = this.strokeWidth;
+	this.strokeWidth = 0;
+	this.scaleY = (boundHeight*cos-boundWidth*sin)/cos2t / this.width;
+	this.scaleX = (boundWidth*cos-boundHeight*sin)/cos2t / this.height;
+
+	this.setCoords();
 	this.setPositionByOrigin(new fabric.Point(coords.centerX, coords.centerY),'center','center');
-	
+
+	this.strokeWidth = tempStroke;
     }
     
     fabric.Object.prototype.getSnapPoints = function() {
@@ -92,6 +102,31 @@ function fabricAddSnapper() {
 	}
 	    
 	this.setByBoundingCoords(setCoords);
+    }
+
+    fabric.Canvas.prototype._beforeSnapTranform = function(e) {
+	var object  =this.getObjectById(e.target.id)
+	object.lastValidBounds = object.getBoundingCoords(true);
+	console.log(object.lastValidBounds);
+    }
+    
+    fabric.Object.prototype._snapScale = function() {
+	var coords = this.getBoundingCoords(true),
+	    snaps = this.getSnapPoints(),
+	    snapped = false,
+	    setCoords = coords,
+	    height = 0;
+	
+
+	function inRange (x1,x2,range) {
+	    return Math.abs(x1 - x2) <= range;
+	}
+
+	if (inRange(coords.top,snaps.v[0],this.snapMargin)) {
+	    setCoords.top = snaps.v[0];
+	}	
+	this.setByBoundingCoords(setCoords);
+
     }
 }
 
