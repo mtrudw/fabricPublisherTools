@@ -10,22 +10,35 @@ function fabricAddSnapper() {
     fabric.Object.prototype.snapMargin =4;
 
     fabric.Object.prototype.getBoundingCoords = function(calc) {
+	var tempStroke = this.strokeWidth;
+	this.strokeWidth = 0;
 	if (calc) {
 	    this.setCoords();
 	}
 	var center = this.getCenterPoint();
-	
+
 	var bounds = {'left': Math.min(this.aCoords.tl.x,this.aCoords.tr.x,this.aCoords.bl.x,this.aCoords.br.x),
 		      'top': Math.min(this.aCoords.tl.y,this.aCoords.tr.y,this.aCoords.bl.y,this.aCoords.br.y),
 		      'bottom': Math.max(this.aCoords.tl.y,this.aCoords.tr.y,this.aCoords.bl.y,this.aCoords.br.y),
 		      'right':  Math.max(this.aCoords.tl.x,this.aCoords.tr.x,this.aCoords.bl.x,this.aCoords.br.x),
 		      'centerX': center.x,
 		      'centerY': center.y};
+	this.strokeWidth = tempStroke;
 	return bounds;
     }
 
     fabric.Object.prototype.setByBoundingCoords = function(coords) {
+	var theta = fabric.util.degreesToRadians(this.angle),
+            cos = fabric.util.cos(theta),
+            sin = fabric.util.sin(theta),
+	    cos2t = fabric.util.cos(2*theta),
+	    boundHeight = coords.bottom-coords.top,
+	    boundWidth = coords.right-coords.left;
+	
+	this.scaleX = (boundHeight*cos-boundWidth*sin)/cos2t / this.width;
+	this.scaleY = (boundWidth*cos-boundHeight*sin)/cos2t / this.width;
 	this.setPositionByOrigin(new fabric.Point(coords.centerX, coords.centerY),'center','center');
+	
     }
     
     fabric.Object.prototype.getSnapPoints = function() {
