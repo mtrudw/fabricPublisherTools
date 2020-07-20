@@ -15,6 +15,7 @@ function fabricAddSnapper() {
     fabric.Object.prototype.snapMargin =4;
     fabric.Object.prototype._snapX = [];
     fabric.Object.prototype._snapY = [];
+    fabric.Canvas.prototype._snappedLines = [];
     
     fabric.Object.prototype.getBoundingCoords = function(calc) {
 	var tempStroke = this.strokeWidth;
@@ -69,6 +70,7 @@ function fabricAddSnapper() {
 	this.setPositionByOrigin(new fabric.Point(coords.centerX, coords.centerY),'center','center');
 
 	this.strokeWidth = tempStroke;
+	return coords;
     }
     
     fabric.Canvas.prototype._registerSnaps = function(provider) {
@@ -102,7 +104,8 @@ function fabricAddSnapper() {
 		
 		if (snap.x || snap.y) {
 		    snapObj = {pos:  snap.x ? snap.x : snap.y,
-			       condition: snap.condition}
+			       condition: snap.condition,
+			       renderActive: snap.renderActive}
 		} else {
 		    continue;
 		}
@@ -127,7 +130,32 @@ function fabricAddSnapper() {
 	    }
 	}
     }
-    
+
+    fabric.Object.prototype._updateSnappedLines= function(coords) {
+	this.canvas._snappedLines.length = 0;
+	['top', 'centerY', 'bottom'].forEach((key) => {
+	    if (this._snapY[Math.round(coords[key])]) {
+		this._snapY[Math.round(coords[key])].forEach((obj) =>{
+		    if (Math.abs(obj.pos - coords[key])<2) {
+			obj.direction = 'h';
+			this.canvas._snappedLines.push(obj);
+		    }		    
+		});
+	    }
+	});
+							   
+	['left', 'centerX', 'right'].forEach((key) => {
+	    if (this._snapX[Math.round(coords[key])]) {
+		this._snapX[Math.round(coords[key])].forEach((obj) =>{
+		    if (Math.abs(obj.pos- coords[key])<2) {
+			obj.direction = 'v';
+			this.canvas._snappedLines.push(obj);
+		    }
+		});
+	    }
+	});
+    }
+
     
     fabric.Object.prototype._snapMove = function() {
 	var coords = this.getBoundingCoords(true),
@@ -216,6 +244,7 @@ function fabricAddSnapper() {
 	}
 
 	this.setByBoundingCoords(setCoords);
+	this._updateSnappedLines(setCoords);
     }
 
     fabric.Canvas.prototype._beforeSnapTranform = function(e) {
@@ -224,6 +253,7 @@ function fabricAddSnapper() {
 	    object._prepareSnaps();
 	}
     }
+
     
     fabric.Object.prototype._snapScale = function(e) {
 	var coords = this.getBoundingCoords(true),
@@ -321,10 +351,50 @@ function fabricAddSnapper() {
 	}	
 
 
-	this.setByBoundingCoords(setCoords);
-
+	setCoords = this.setByBoundingCoords(setCoords);
+	this._updateSnappedLines(setCoords);
     }
 
+    /**
+     * Render active guides
+     */
+    fabric.Canvas.prototype._renderActiveGuides = function() {
+	var ctx = this.getSelectionContext();
+	 function drawLine(x1, y1, x2, y2, color) {
+	     ctx.save();
+	     ctx.lineWidth = 1;
+	     ctx.strokeStyle = color;
+	     ctx.beginPath();
+	     ctx.moveTo(x1, y1);
+	     ctx.lineTo(x2,y2);
+	     ctx.stroke();
+	     ctx.restore();
+	 }
+
+	if (!this.getActiveObject()){
+	    return;
+	}
+	for (var i = 0 ; i< this._snappedLines.length; i++){
+	    var render = this._snappedLines[i].renderActive;
+	    if (render) {
+		if ('h' == this._snappedLines[i].direction){
+		    var lr = render(this.getActiveObject());
+		    if (lr.left && lr.right) {
+			var y = this._snappedLines[i].pos;
+			drawLine(lr.left,y,lr.right,y, lr.color? lr.color: 'green');
+		    }
+		} else if ('v' == this._snappedLines[i].direction){
+		    var lr = render(this.getActiveObject());
+		    if (lr.top && lr.bottom) {
+			var x = this._snappedLines[i].pos;
+			drawLine(x,lr.top,x,lr.bottom, lr.color? lr.color: 'green');
+		    }
+		}
+
+	    }
+	}
+	
+    }
     /**
      * Override the initialize function to add events
      */
@@ -333,6 +403,11 @@ function fabricAddSnapper() {
 	    originalFn.call(this, ...args);
 	    this.on({
 		'mouse:down': this._beforeSnapTranform,
+		'before:render': function(e) {
+		    this.clearContext(this.contextTop);
+		}.bind(this),
+		'after:render':this._renderActiveGuides,
+		
 	    });
 	    return this;
 	};
@@ -349,3 +424,4 @@ function fabricAddSnapper() {
 }
 
 export {fabricAddSnapper};
+
