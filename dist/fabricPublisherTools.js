@@ -29666,114 +29666,114 @@ const ImageContainer = fabric_1.fabric.util.createClass(fabric_1.fabric.Rect, {
     imgOrigLeft: 0,
     fillcontainer: false,
     initialize(options) {
-	options.absolutePositioned = true;
-	options.fill = '#666666';
-	options.opacity = 1;
-	this.callSuper('initialize', options);
-	Object.assign(this, options);
+        options.absolutePositioned = true;
+        options.fill = '#666666';
+        options.opacity = 1;
+        this.callSuper('initialize', options);
+        Object.assign(this, options);
     },
     loadImage(src, options) {
-	fabric_1.fabric.Image.fromURL(src, function(img) {
-	    this.img = img;
-	    if (this.fillcontainer) {
-		var widthscale = this.width / this.img.width;
-		var heightscale = this.height / this.img.height;
-		this.img.scale(Math.max(widthscale, heightscale));
-	    }
-	    this.img.left = this.left;
-	    this.img.top = this.top;
-	    this.img.clipPath = this;
-	    this.canvas.add(this.img);
-	    this.img.setCoords();
-	    this.img.selectable = false;
-	    this.img.excludeFromExport = true;
-	    if (options) {
-		Object.assign(this.img,options);
-	    }
-	    this.canvas.bringToFront(this);
-	    // bug in Fabric?
-	    this.opacity = 0.00001;
+        fabric_1.fabric.Image.fromURL(src, function(img) {
+            this.img = img;
+            if (this.fillcontainer) {
+                var widthscale = this.width / this.img.width;
+                var heightscale = this.height / this.img.height;
+                this.img.scale(Math.max(widthscale, heightscale));
+            }
+            this.img.left = this.left;
+            this.img.top = this.top;
+            this.img.clipPath = this;
+            this.canvas.add(this.img);
+            this.img.setCoords();
+            this.img.selectable = false;
+            this.img.excludeFromExport = true;
+            if (options) {
+                Object.assign(this.img,options);
+            }
+            this.canvas.bringToFront(this);
+            // bug in Fabric?
+            this.opacity = 0.00001;
 
-	    // set event listeners
-	    this.on({
-		'mousedblclick': this._dblClickListener(this),
-		'mousedown': this._mouseDownListener(this),
-		'moving': this._movingListener(this),
-	    });
-	    this.img.on({
-		'selected': this._imgSelectedListener(this),
-		'deselected': this._imgDeselectedListener(this)
-	    });
+            // set event listeners
+            this.on({
+                'mousedblclick': this._dblClickListener(this),
+                'mousedown': this._mouseDownListener(this),
+                'moving': this._movingListener(this),
+            });
+            this.img.on({
+                'selected': this._imgSelectedListener(this),
+                'deselected': this._imgDeselectedListener(this)
+            });
 
-	}.bind(this));
+        }.bind(this));
     },
     _dblClickListener(container) {
-	return function(e) {
-	    container.img.selectable = true;
-	    container.img.setCoords();
-	    container.canvas.setActiveObject(container.img);
-	    container.canvas.requestRenderAll();
-	}
+        return function() {
+            container.img.selectable = true;
+            container.img.setCoords();
+            container.canvas.setActiveObject(container.img);
+            container.canvas.requestRenderAll();
+        }
     },
     _mouseDownListener(container) {
-	return function(e) {
-	    container.origTop = container.top;
-	    container.origLeft = container.left;
-	    container.imgOrigTop = container.img.top;
-	    container.imgOrigLeft = container.img.left;
-	}
+        return function() {
+            container.origTop = container.top;
+            container.origLeft = container.left;
+            container.imgOrigTop = container.img.top;
+            container.imgOrigLeft = container.img.left;
+        }
     },
     _movingListener(container) {
-	return function(e) {
-	    container.img.top = container.imgOrigTop + (container.top - container.origTop);
-	    container.img.left = container.imgOrigLeft + (container.left - container.origLeft);
-	    container.img.setCoords();
-	}
+        return function() {
+            container.img.top = container.imgOrigTop + (container.top - container.origTop);
+            container.img.left = container.imgOrigLeft + (container.left - container.origLeft);
+            container.img.setCoords();
+        }
     },
     _imgSelectedListener(container) {
-	return function(e) {
-	    container.selectable = false;
-	    container.setCoords();
-	    container.opacity = 1;
-	    container.img.clipPath = null;
-	    container.img.opacity = 0.7;
-	}
+        return function() {
+            container.selectable = false;
+            container.setCoords();
+            container.opacity = 1;
+            container.img.clipPath = null;
+            container.img.opacity = 0.7;
+        }
     },
     _imgDeselectedListener(container) {
-	return function(e) {
-	    container.img.clipPath = container;
-	    container.opacity = 0;
-	    container.selectable = true;
-	    container.img.selectable = false;
-	    container.img.opacity = 1;
-	}
+        return function() {
+            container.img.clipPath = container;
+            container.opacity = 0;
+            container.selectable = true;
+            container.img.selectable = false;
+            container.img.opacity = 1;
+        }
     },
     toObject() {
-	this.img.clipPath = null;
-	var imgObj;
-	if (this.img.toObject) {
-      	    imgObj = this.img.toObject();
+        this.img.clipPath = null;
+        var imgObj;
+        if (this.img.toObject) {
+            imgObj = this.img.toObject();
         } else {
             imgObj = this.img;
         }
-	var object = fabric_1.fabric.util.object.extend(this.callSuper('toObject'), { fillContainer: this.fillContainer, img: imgObj });
-	this.img.clipPath = this;
-	return object;
-	
+        var object = fabric_1.fabric.util.object.extend(this.callSuper('toObject'), { fillContainer: this.fillContainer, img: imgObj });
+        this.img.clipPath = this;
+        return object;
+        
     },
     _render(ctx) {
-	this.callSuper('_render', ctx);
+        this.callSuper('_render', ctx);
 
     }
 });
 
 ImageContainer.fromObject = function(obj, callback){
-  fabric_1.fabric.Object._fromObject('ImageContainer',obj,function(container){
-      callback(container);
-      if (obj.img) {
-	  container.loadImage(obj.img.src,obj.img);
-      }
-   });
+    fabric_1.fabric.Object._fromObject('ImageContainer',obj,function(container){
+        callback(container);
+        if (obj.img) {
+            container.loadImage(obj.img.src,obj.img);
+        }
+    });
 };
 
 fabric_1.fabric.ImageContainer = ImageContainer;
@@ -29789,25 +29789,25 @@ function fabricAddObjectIDs() {
 
 
     fabric_1.fabric.Canvas.prototype.add = (function(originalFn) {
-	return function(...args) {
-	    args.forEach(obj => {
-		if (null == obj.id) {
-		    obj.id = this.id++;
-		}
-	    });
-	    originalFn.call(this, ...args);
-	    
-	    return this
-	};
+        return function(...args) {
+            args.forEach(obj => {
+                if (null == obj.id) {
+                    obj.id = this.id++;
+                }
+            });
+            originalFn.call(this, ...args);
+            
+            return this
+        };
     })(fabric_1.fabric.Canvas.prototype.add);
 
     
     fabric_1.fabric.Object.prototype.toObject = (function(originalFn) {
-	return function(properties) {
-	    return fabric_1.fabric.util.object.extend(originalFn.call(this, properties), {
-		id: this.id
-	    });
-	};
+        return function(properties) {
+            return fabric_1.fabric.util.object.extend(originalFn.call(this, properties), {
+                id: this.id
+            });
+        };
     })(fabric_1.fabric.Object.prototype.toObject);
 
 
@@ -29820,53 +29820,53 @@ function fabricAddObjectIDs() {
      * id to look for
      */
     fabric_1.fabric.Canvas.prototype.getObjectById = function(id) {
-	var object = null,
-	    objects = this.getObjects();
-	for (var i = 0, len = this.size(); i < len; i++) {
-	    if (id === objects[i].id) {
-		object = objects[i];
-		break;
-	    }
-	}
+        var object = null,
+            objects = this.getObjects();
+        for (var i = 0, len = this.size(); i < len; i++) {
+            if (id === objects[i].id) {
+                object = objects[i];
+                break;
+            }
+        }
 
-	return object;
+        return object;
     };
 
     fabric_1.fabric.Canvas.prototype.toJSON = (function(toJSON) {
-	return function(propertiesToInclude) {
-	    return fabric_1.fabric.util.object.extend(toJSON.call(this, propertiesToInclude), {
-		id: this.id,
-	    });
-	}
+        return function(propertiesToInclude) {
+            return fabric_1.fabric.util.object.extend(toJSON.call(this, propertiesToInclude), {
+                id: this.id,
+            });
+        }
     })(fabric_1.fabric.Canvas.prototype.toJSON);
 }
 
 const propertiesToWatch = ['stroke','fill'];
 
 /**
-* Adds Undo and Redo capabilities to fabric.Canvas. Changes are logged as actions and will be 
-* serialized and deserialized with the canvas.
-* Calling canvas.undo() and canvas.redo() will undo or redo as long as there are actions on the respective stack.
-* Performing an action will reset the redo history. 
-*
-* Needs ObjectIds. It will add ObjectIds if they are not present.
-*
-* @param {array} properties
-* List of properties to be watched when object.set is called. Uses defaults if not passed
-* Use {@link object.set} with forceHistory if unwatched property is set thorugh code
-*/
+ * Adds Undo and Redo capabilities to fabric.Canvas. Changes are logged as actions and will be 
+ * serialized and deserialized with the canvas.
+ * Calling canvas.undo() and canvas.redo() will undo or redo as long as there are actions on the respective stack.
+ * Performing an action will reset the redo history. 
+ *
+ * Needs ObjectIds. It will add ObjectIds if they are not present.
+ *
+ * @param {array} properties
+ * List of properties to be watched when object.set is called. Uses defaults if not passed
+ * Use {@link object.set} with forceHistory if unwatched property is set thorugh code
+ */
 function fabricAddUndoRedo(properties) {
     if (0 !== fabric_1.fabric.Canvas.prototype.id) {
-	fabricAddObjectIDs();
+        fabricAddObjectIDs();
     }
 
     if (fabric_1.fabric.Canvas.prototype._undoRedoAttached) {
-	if  (properties) {
-	    fabric_1.fabric.Object.prototype.historyWatch =properties;
-	} else {
-	    fabric_1.fabric.Object.prototype.historyWatch = propertiesToWatch;
-	}
-	return;
+        if  (properties) {
+            fabric_1.fabric.Object.prototype.historyWatch =properties;
+        } else {
+            fabric_1.fabric.Object.prototype.historyWatch = propertiesToWatch;
+        }
+        return;
     }
     
     fabric_1.fabric.Canvas.prototype._undoRedoAttached = true;
@@ -29876,9 +29876,9 @@ function fabricAddUndoRedo(properties) {
     fabric_1.fabric.Canvas.prototype.redoing = false;
 
     if  (properties) {
-	fabric_1.fabric.Object.prototype.historyWatch =properties;
+        fabric_1.fabric.Object.prototype.historyWatch =properties;
     } else {
-	fabric_1.fabric.Object.prototype.historyWatch = propertiesToWatch;
+        fabric_1.fabric.Object.prototype.historyWatch = propertiesToWatch;
     }
 
     /**
@@ -29886,12 +29886,12 @@ function fabricAddUndoRedo(properties) {
      *
      */
     fabric_1.fabric.Canvas.prototype._pushToHistory = function(event) {
-	if (this.recordHistory) {
-	    this.historyStack.push(event);
-	    if (!this.redoing) {
-		this.redoStack.length = 0;
-	    }
-	}
+        if (this.recordHistory) {
+            this.historyStack.push(event);
+            if (!this.redoing) {
+                this.redoStack.length = 0;
+            }
+        }
     };
 
     /**
@@ -29899,39 +29899,39 @@ function fabricAddUndoRedo(properties) {
      * action is performed.
      * Events for add and remove need to be prepared beforehand
      */
-   
+    
     fabric_1.fabric.Canvas.prototype._buildHistoryEvent = function(event) {
-	var id = event.target.id;
+        var id = event.target.id;
 
-	var historyEvent = {};
-	historyEvent.id = id;
-	historyEvent.action = event.transform.action;
-	historyEvent.before = [];
-	historyEvent.after = [];
+        var historyEvent = {};
+        historyEvent.id = id;
+        historyEvent.action = event.transform.action;
+        historyEvent.before = [];
+        historyEvent.after = [];
 
-	if ('added' === historyEvent.action) {
-	    historyEvent.after = event.target.toObject();
-	    return historyEvent;
-	}
-	
-	if ('removed' === historyEvent.action) {
-	    historyEvent.before = event.target.toObject();
-	    return historyEvent;
-	}
+        if ('added' === historyEvent.action) {
+            historyEvent.after = event.target.toObject();
+            return historyEvent;
+        }
+        
+        if ('removed' === historyEvent.action) {
+            historyEvent.before = event.target.toObject();
+            return historyEvent;
+        }
 
-	Object.keys(event.transform.original).forEach(function(key, index) {
-	    if (event.transform.original[key] !== event.transform.target[key]) {
-		if ('originX' !== key && 'originY' !== key) {
-		    historyEvent.before.push({
-			[key]: event.transform.original[key]
-		    });
-		    historyEvent.after.push({
-			[key]: event.transform.target[key]
-		    });
-		}
-	    }
-	});
-	return historyEvent;
+        Object.keys(event.transform.original).forEach(function(key) {
+            if (event.transform.original[key] !== event.transform.target[key]) {
+                if ('originX' !== key && 'originY' !== key) {
+                    historyEvent.before.push({
+                        [key]: event.transform.original[key]
+                    });
+                    historyEvent.after.push({
+                        [key]: event.transform.target[key]
+                    });
+                }
+            }
+        });
+        return historyEvent;
     };
 
     /**
@@ -29939,93 +29939,93 @@ function fabricAddUndoRedo(properties) {
      * and pushes that action to redo stack
      */
     fabric_1.fabric.Canvas.prototype.undo = function() {
-	var event = this.historyStack.pop();
-	var obj = null;
-	this.recordHistory = false;
+        var event = this.historyStack.pop();
+        var obj = null;
+        this.recordHistory = false;
 
-	if (event) {
-	    this.redoStack.push(event);
-	    if ('added' == event.action) {
-		obj = this.getObjectById(event.id);
-		this.remove(obj);
-		this.renderAll();
-	    } else if ('removed' == event.action) {
-		fabric_1.fabric.util.enlivenObjects([event.before], function(enlivenedObjects) {
-		    enlivenedObjects.forEach(function(obj) {
-			this.add(obj);
-		    }.bind(this));
-		    this.renderAll();
-		}.bind(this));
-	    } else {
-		obj = this.getObjectById(event.id);
-		Object.assign(obj, ...event.before);
-		obj.set('dirty',true);
-		obj.setCoords();
-		this.renderAll();
-	    }
-	}
-	this.recordHistory = true;
+        if (event) {
+            this.redoStack.push(event);
+            if ('added' == event.action) {
+                obj = this.getObjectById(event.id);
+                this.remove(obj);
+                this.renderAll();
+            } else if ('removed' == event.action) {
+                fabric_1.fabric.util.enlivenObjects([event.before], function(enlivenedObjects) {
+                    enlivenedObjects.forEach(function(obj) {
+                        this.add(obj);
+                    }.bind(this));
+                    this.renderAll();
+                }.bind(this));
+            } else {
+                obj = this.getObjectById(event.id);
+                Object.assign(obj, ...event.before);
+                obj.set('dirty',true);
+                obj.setCoords();
+                this.renderAll();
+            }
+        }
+        this.recordHistory = true;
     };
 
     /**
      * Redoes an action if one is available on the redo stack and pushes it back to the undo history
      */
     fabric_1.fabric.Canvas.prototype.redo = function() {
-	var event = this.redoStack.pop();
-	var obj = null;
-	this.redoing = true;
-	
-	if (event) {
-	    this._pushToHistory(event);
-	    this.recordHistory = false;
-	    if ('added' == event.action) {
-		fabric_1.fabric.util.enlivenObjects([event.after], function(enlivenedObjects) {
-		    enlivenedObjects.forEach(function(obj) {
-			this.add(obj);
-		    }.bind(this));
-		    this.renderAll();
-		}.bind(this));
-	    } else if ('removed' == event.action) {
-		obj = this.getObjectById(event.id);
-		this.remove(obj);
-		this.renderAll();
-	    } else {
-		obj = this.getObjectById(event.id);
-		Object.assign(obj, ...event.after);
-		obj.set('dirty',true);
-		obj.setCoords();
-		this.renderAll();
-	    }
-	}
-	this.redoing = false;
-	this.recordHistory = true;
+        var event = this.redoStack.pop();
+        var obj = null;
+        this.redoing = true;
+        
+        if (event) {
+            this._pushToHistory(event);
+            this.recordHistory = false;
+            if ('added' == event.action) {
+                fabric_1.fabric.util.enlivenObjects([event.after], function(enlivenedObjects) {
+                    enlivenedObjects.forEach(function(obj) {
+                        this.add(obj);
+                    }.bind(this));
+                    this.renderAll();
+                }.bind(this));
+            } else if ('removed' == event.action) {
+                obj = this.getObjectById(event.id);
+                this.remove(obj);
+                this.renderAll();
+            } else {
+                obj = this.getObjectById(event.id);
+                Object.assign(obj, ...event.after);
+                obj.set('dirty',true);
+                obj.setCoords();
+                this.renderAll();
+            }
+        }
+        this.redoing = false;
+        this.recordHistory = true;
     };
 
     /**
      * Eventlistener to prepare object added event and push it to history
      */
     fabric_1.fabric.Canvas.prototype._undoRedoAddedListener = function(e) {
-	e.transform = {
-	    action: 'added'
-	};
-	this._pushToHistory(this._buildHistoryEvent(e));
+        e.transform = {
+            action: 'added'
+        };
+        this._pushToHistory(this._buildHistoryEvent(e));
     };
 
     /**
      * Eventlistener to prepare object removed event and push it to history
      */
     fabric_1.fabric.Canvas.prototype._undoRedoRemovedListener = function(e) {
-	e.transform = {
-	    action: 'removed'
-	};
-	this._pushToHistory(this._buildHistoryEvent(e));
+        e.transform = {
+            action: 'removed'
+        };
+        this._pushToHistory(this._buildHistoryEvent(e));
     };
 
     /**
      * Eventlistener to push general modification event to history
      */
     fabric_1.fabric.Canvas.prototype._undoRedoModifiedListener = function(e) {
-	this._pushToHistory(this._buildHistoryEvent(e));
+        this._pushToHistory(this._buildHistoryEvent(e));
     };
 
 
@@ -30033,27 +30033,27 @@ function fabricAddUndoRedo(properties) {
      * Override the initialize function to add events
      */
     fabric_1.fabric.Canvas.prototype.initialize = (function(originalFn) {
-	return function(...args) {
-	    originalFn.call(this, ...args);
-	    this.on({
-		'object:modified': this._undoRedoModifiedListener,
-		'object:added': this._undoRedoAddedListener,
-		'object:removed': this._undoRedoRemovedListener,
-	    });
+        return function(...args) {
+            originalFn.call(this, ...args);
+            this.on({
+                'object:modified': this._undoRedoModifiedListener,
+                'object:added': this._undoRedoAddedListener,
+                'object:removed': this._undoRedoRemovedListener,
+            });
 
-	    return this;
-	};
+            return this;
+        };
     })(fabric_1.fabric.Canvas.prototype.initialize);
 
 
     
     fabric_1.fabric.Canvas.prototype.toJSON = (function(toJSON) {
-	return function(propertiesToInclude) {
-	    return fabric_1.fabric.util.object.extend(toJSON.call(this, propertiesToInclude), {
-		historyStack: this.historyStack,
-		redoStack: this.redoStack,
-	    });
-	}
+        return function(propertiesToInclude) {
+            return fabric_1.fabric.util.object.extend(toJSON.call(this, propertiesToInclude), {
+                historyStack: this.historyStack,
+                redoStack: this.redoStack,
+            });
+        }
     })(fabric_1.fabric.Canvas.prototype.toJSON);
 
 
@@ -30066,33 +30066,33 @@ function fabricAddUndoRedo(properties) {
      * @param {boolean} forceHistory push to history even if logging is off or key is not on watch list
      */
     fabric_1.fabric.Object.prototype._set = (function(originalFn) {
-	return function(key, value, forceHistory) {
-	    if (forceHistory || (this.historyWatch.includes(key) && this.canvas && this[key] !== value)) {
-		this.canvas._pushToHistory({
-		    'action':'set', 
-		    'id': this.id,
-		    'before':[
-			{[key]: this[key]},
-		    ],
-		    'after':[
-			{[key]: value},
-		    ],
-		});
-		
-	    }
-	    originalFn.call(this, key, value);
-	    return this;
-	}
+        return function(key, value, forceHistory) {
+            if (forceHistory || (this.historyWatch.includes(key) && this.canvas && this[key] !== value)) {
+                this.canvas._pushToHistory({
+                    'action':'set', 
+                    'id': this.id,
+                    'before':[
+                        {[key]: this[key]},
+                    ],
+                    'after':[
+                        {[key]: value},
+                    ],
+                });
+                
+            }
+            originalFn.call(this, key, value);
+            return this;
+        }
     })(fabric_1.fabric.Object.prototype._set);
 }
 
 function fabricAddSnapper() {
     
     if (fabric_1.fabric.Canvas.prototype._snapperAttached) {
-	return;
+        return;
     }
     if (0 !== fabric_1.fabric.Canvas.prototype.id) {
-	fabricAddObjectIDs();
+        fabricAddObjectIDs();
     }
 
     fabric_1.fabric.Canvas.prototype._snapperAttached = true;
@@ -30103,21 +30103,21 @@ function fabricAddSnapper() {
     fabric_1.fabric.Canvas.prototype._snappedLines = [];
     
     fabric_1.fabric.Object.prototype.getBoundingCoords = function(calc) {
-	var tempStroke = this.strokeWidth;
-	this.strokeWidth = 0;
-	if (calc) {
-	    this.setCoords();
-	}
-	var center = this.getCenterPoint();
+        var tempStroke = this.strokeWidth;
+        this.strokeWidth = 0;
+        if (calc) {
+            this.setCoords();
+        }
+        var center = this.getCenterPoint();
 
-	var bounds = {'left': Math.min(this.aCoords.tl.x,this.aCoords.tr.x,this.aCoords.bl.x,this.aCoords.br.x),
-		      'top': Math.min(this.aCoords.tl.y,this.aCoords.tr.y,this.aCoords.bl.y,this.aCoords.br.y),
-		      'bottom': Math.max(this.aCoords.tl.y,this.aCoords.tr.y,this.aCoords.bl.y,this.aCoords.br.y),
-		      'right':  Math.max(this.aCoords.tl.x,this.aCoords.tr.x,this.aCoords.bl.x,this.aCoords.br.x),
-		      'centerX': center.x,
-		      'centerY': center.y};
-	this.strokeWidth = tempStroke;
-	return bounds;
+        var bounds = {'left': Math.min(this.aCoords.tl.x,this.aCoords.tr.x,this.aCoords.bl.x,this.aCoords.br.x),
+                      'top': Math.min(this.aCoords.tl.y,this.aCoords.tr.y,this.aCoords.bl.y,this.aCoords.br.y),
+                      'bottom': Math.max(this.aCoords.tl.y,this.aCoords.tr.y,this.aCoords.bl.y,this.aCoords.br.y),
+                      'right':  Math.max(this.aCoords.tl.x,this.aCoords.tr.x,this.aCoords.bl.x,this.aCoords.br.x),
+                      'centerX': center.x,
+                      'centerY': center.y};
+        this.strokeWidth = tempStroke;
+        return bounds;
     };
 
     /**
@@ -30127,464 +30127,459 @@ function fabricAddSnapper() {
      */
 
     fabric_1.fabric.Object.prototype.setByBoundingCoords = function(coords) {
-	var angle = this.angle > 180 ? 360-this.angle : this.angle;
-	angle = angle > 90 ? 180 - angle : angle;
-	
-	var theta = fabric_1.fabric.util.degreesToRadians(angle),
+        var angle = this.angle > 180 ? 360-this.angle : this.angle;
+        angle = angle > 90 ? 180 - angle : angle;
+        
+        var theta = fabric_1.fabric.util.degreesToRadians(angle),
             cos = fabric_1.fabric.util.cos(theta),
             sin = fabric_1.fabric.util.sin(theta),
-	    cos2t = fabric_1.fabric.util.cos(2*theta),
-	    boundHeight = coords.bottom-coords.top,
-	    boundWidth = coords.right-coords.left;
-	var tempStroke = this.strokeWidth;
-	coords.centerY = coords.top + (coords.bottom-coords.top)/2;
-	coords.centerX = coords.left + (coords.right-coords.left)/2;
-	if (0 !== cos2t) {
-	    this.scaleY = (boundHeight*cos-boundWidth*sin)/cos2t / this.height;
-	    this.scaleX = (boundWidth*cos-boundHeight*sin)/cos2t / this.width;
-	} else {
-	    var aspect = (this.width*this.scaleX)/(this.height*this.scaleY),
-		calcHeight = boundHeight/((aspect + 1)*cos);
-	    this.scaleY = calcHeight / this.height;
-	    this.scaleX = aspect *calcHeight / this.width;
-	}
+            cos2t = fabric_1.fabric.util.cos(2*theta),
+            boundHeight = coords.bottom-coords.top,
+            boundWidth = coords.right-coords.left;
+        var tempStroke = this.strokeWidth;
+        coords.centerY = coords.top + (coords.bottom-coords.top)/2;
+        coords.centerX = coords.left + (coords.right-coords.left)/2;
+        if (0 !== cos2t) {
+            this.scaleY = (boundHeight*cos-boundWidth*sin)/cos2t / this.height;
+            this.scaleX = (boundWidth*cos-boundHeight*sin)/cos2t / this.width;
+        } else {
+            var aspect = (this.width*this.scaleX)/(this.height*this.scaleY),
+                calcHeight = boundHeight/((aspect + 1)*cos);
+            this.scaleY = calcHeight / this.height;
+            this.scaleX = aspect *calcHeight / this.width;
+        }
 
-	this.strokeWidth = 0;
+        this.strokeWidth = 0;
 
-	this.setCoords();
-	this.setPositionByOrigin(new fabric_1.fabric.Point(coords.centerX, coords.centerY),'center','center');
+        this.setCoords();
+        this.setPositionByOrigin(new fabric_1.fabric.Point(coords.centerX, coords.centerY),'center','center');
 
-	this.strokeWidth = tempStroke;
-	return coords;
+        this.strokeWidth = tempStroke;
+        return coords;
     };
     
     fabric_1.fabric.Canvas.prototype._registerSnaps = function(provider) {
-	if (provider && {}.toString.call(provider) === '[object Function]') {
-	    this._registeredSnappers.push(provider);
-	    return true;
-	} else {
-	    return false;
-	}
-    };
-
-    fabric_1.fabric.Canvas.prototype._unregisterSnaps = function(provider) {
-
+        if (provider && {}.toString.call(provider) === '[object Function]') {
+            this._registeredSnappers.push(provider);
+            return true;
+        } else {
+            return false;
+        }
     };
     
     fabric_1.fabric.Object.prototype._prepareSnaps =  function() {
-	var snaps= null,
-	    snap = null;
-	var snapObj = null;
-	this._snapX.length = Math.ceil(this.canvas.width);
-	this._snapY.length = Math.ceil(this.canvas.height);
-	this._snapX = this._snapX.fill(false,0,Math.ceil(this.canvas.width));
-	this._snapY = this._snapY.fill(false,0,Math.ceil(this.canvas.height));
-	for (var i =0;i< this.canvas._registeredSnappers.length; i++) {
-	    snaps = this.canvas._registeredSnappers[i]();
-	    for (var j = 0; j<snaps.length;j++) {
-		snap = snaps[j];
-		if (snap.validTarget && ! snap.validTarget(this)) {
-		    continue;
-		}
-		
-		if (snap.x || snap.y) {
-		    snapObj = {pos:  snap.x ? snap.x : snap.y,
-			       condition: snap.condition,
-			       renderActive: snap.renderActive};
-		} else {
-		    continue;
-		}
-		if (snap.x) {
-		    for (var k = Math.floor(snap.x - snap.margin/2); k<Math.ceil(snap.x + snap.margin/2); k++) {
-			if (!this._snapX[k]) {
-			    this._snapX[k] = [snapObj];
-			} else {
-			    this._snapX[k].push([snapObj]);
-			}
-		    }
-		} else {
-		    for (var k = Math.floor(snap.y - snap.margin/2); k<Math.ceil(snap.y + snap.margin/2); k++) {
-			if (!this._snapY[k]) {
-			    this._snapY[k] = [snapObj];
-			} else {
-			    this._snapY[k].push(snapObj);
-			}
-		    }
-		    
-		}
-	    }
-	}
+        var snaps= null,
+            snap = null;
+        var snapObj = null;
+        this._snapX.length = Math.ceil(this.canvas.width);
+        this._snapY.length = Math.ceil(this.canvas.height);
+        this._snapX = this._snapX.fill(false,0,Math.ceil(this.canvas.width));
+        this._snapY = this._snapY.fill(false,0,Math.ceil(this.canvas.height));
+        for (var i =0;i< this.canvas._registeredSnappers.length; i++) {
+            snaps = this.canvas._registeredSnappers[i]();
+            for (var j = 0; j<snaps.length;j++) {
+                snap = snaps[j];
+                if (snap.validTarget && ! snap.validTarget(this)) {
+                    continue;
+                }
+                
+                if (snap.x || snap.y) {
+                    snapObj = {pos:  snap.x ? snap.x : snap.y,
+                               condition: snap.condition,
+                               renderActive: snap.renderActive};
+                } else {
+                    continue;
+                }
+                var k;
+                if (snap.x) {
+                    for (k = Math.floor(snap.x - snap.margin/2); k<Math.ceil(snap.x + snap.margin/2); k++) {
+                        if (!this._snapX[k]) {
+                            this._snapX[k] = [snapObj];
+                        } else {
+                            this._snapX[k].push([snapObj]);
+                        }
+                    }
+                } else {
+                    for (k = Math.floor(snap.y - snap.margin/2); k<Math.ceil(snap.y + snap.margin/2); k++) {
+                        if (!this._snapY[k]) {
+                            this._snapY[k] = [snapObj];
+                        } else {
+                            this._snapY[k].push(snapObj);
+                        }
+                    }
+                    
+                }
+            }
+        }
     };
 
     fabric_1.fabric.Object.prototype._updateSnappedLines= function(coords) {
-	this.canvas._snappedLines.length = 0;
-	['top', 'centerY', 'bottom'].forEach((key) => {
-	    if (this._snapY[Math.round(coords[key])]) {
-		this._snapY[Math.round(coords[key])].forEach((obj) =>{
-		    if (Math.abs(obj.pos - coords[key])<2) {
-			obj.direction = 'h';
-			this.canvas._snappedLines.push(obj);
-		    }		    
-		});
-	    }
-	});
-							   
-	['left', 'centerX', 'right'].forEach((key) => {
-	    if (this._snapX[Math.round(coords[key])]) {
-		this._snapX[Math.round(coords[key])].forEach((obj) =>{
-		    if (Math.abs(obj.pos - coords[key])<2) {
-			obj.direction = 'v';
-			this.canvas._snappedLines.push(obj);
-		    }
-		});
-	    }
-	});
+        this.canvas._snappedLines.length = 0;
+        ['top', 'centerY', 'bottom'].forEach((key) => {
+            if (this._snapY[Math.round(coords[key])]) {
+                this._snapY[Math.round(coords[key])].forEach((obj) =>{
+                    if (Math.abs(obj.pos - coords[key])<2) {
+                        obj.direction = 'h';
+                        this.canvas._snappedLines.push(obj);
+                    }               
+                });
+            }
+        });
+        
+        ['left', 'centerX', 'right'].forEach((key) => {
+            if (this._snapX[Math.round(coords[key])]) {
+                this._snapX[Math.round(coords[key])].forEach((obj) =>{
+                    if (Math.abs(obj.pos - coords[key])<2) {
+                        obj.direction = 'v';
+                        this.canvas._snappedLines.push(obj);
+                    }
+                });
+            }
+        });
     };
 
     
     fabric_1.fabric.Object.prototype._snapMove = function() {
-	var coords = this.getBoundingCoords(true),
+        var coords = this.getBoundingCoords(true),
+            height = coords.bottom - coords.top,
+            width = coords.right-coords.left,
+            setCoords = coords,
+            snap;
 
-	    height = coords.bottom - coords.top,
-	    width = coords.right-coords.left;
-	var setCoords = coords;
-	var snap;
-	//snap Y
+        //snap Y
 
-	var snapped = false,i;
-	if (this._snapY[Math.round(coords.top)]) {
-	    i = 0;
-	    snap = this._snapY[Math.round(coords.top)];
-	    while (!snapped && i<snap.length) {
-		if (snap[i].condition(this)) {
-		    setCoords.top = snap[i].pos;
-		    setCoords.bottom = snap[i].pos +height;
-		    snapped =true;
-		}
-		i++;
-	    }
-	}
-	if (!snapped && this._snapY[Math.round(coords.centerY)]) {
-	    i = 0;
-	    snap = this._snapY[Math.round(coords.centerY)];
-	    while (!snapped && i<snap.length) {
-		if (snap[i].condition(this)) {
-		    setCoords.top = snap[i].pos - height/2;
-		    setCoords.bottom = snap[i].pos +height/2;
-		    snapped =true;
-		}
-		i++;
-	    }
-	}
-	if (this._snapY[Math.round(coords.bottom)]) {
-	    i = 0;
-	    snap = this._snapY[Math.round(coords.bottom)];
-	    while (!snapped && i<snap.length) {
-		if (snap[i].condition(this)) {
-		    setCoords.top = snap[i].pos - height;
-		    setCoords.bottom = snap[i].pos;
-		    snapped =true;
-		}
-		i++;
-	    }	
-	}
+        var snapped = false,i;
+        if (this._snapY[Math.round(coords.top)]) {
+            i = 0;
+            snap = this._snapY[Math.round(coords.top)];
+            while (!snapped && i<snap.length) {
+                if (snap[i].condition(this)) {
+                    setCoords.top = snap[i].pos;
+                    setCoords.bottom = snap[i].pos +height;
+                    snapped =true;
+                }
+                i++;
+            }
+        }
+        if (!snapped && this._snapY[Math.round(coords.centerY)]) {
+            i = 0;
+            snap = this._snapY[Math.round(coords.centerY)];
+            while (!snapped && i<snap.length) {
+                if (snap[i].condition(this)) {
+                    setCoords.top = snap[i].pos - height/2;
+                    setCoords.bottom = snap[i].pos +height/2;
+                    snapped =true;
+                }
+                i++;
+            }
+        }
+        if (this._snapY[Math.round(coords.bottom)]) {
+            i = 0;
+            snap = this._snapY[Math.round(coords.bottom)];
+            while (!snapped && i<snap.length) {
+                if (snap[i].condition(this)) {
+                    setCoords.top = snap[i].pos - height;
+                    setCoords.bottom = snap[i].pos;
+                    snapped =true;
+                }
+                i++;
+            }   
+        }
 
-	//snap X
-	snapped =false;
-	if (this._snapX[Math.round(coords.left)]) {
-	    i = 0;
-	    snap = this._snapX[Math.round(coords.left)];
-	    while (!snapped && i<snap.length) {
-		if (snap[i].condition(this)) {
-		    setCoords.left = snap[i].pos;
-		    setCoords.right = snap[i].pos +width;
-		    snapped =true;
-		}
-		i++;
-	    }
-	}
-	if (!snapped && this._snapX[Math.round(coords.centerX)]) {
-	    i = 0;
-	    snap = this._snapX[Math.round(coords.centerX)];
-	    while (!snapped && i<snap.length) {
-		if (snap[i].condition(this)) {
-		    setCoords.left = snap[i].pos - width/2;
-		    setCoords.right = snap[i].pos +width/2;
-		    snapped =true;
-		}
-		i++;
-	    }
-	}
-	if (this._snapX[Math.round(coords.right)]) {
-	    i = 0;
-	    snap = this._snapX[Math.round(coords.right)];
-	    while (!snapped && i<snap.length) {
-		if (snap[i].condition(this)) {
-		    setCoords.left = snap[i].pos - width;
-		    setCoords.right = snap[i].pos;
-		    snapped =true;
-		}
-		i++;
-	    }	
-	}
+        //snap X
+        snapped =false;
+        if (this._snapX[Math.round(coords.left)]) {
+            i = 0;
+            snap = this._snapX[Math.round(coords.left)];
+            while (!snapped && i<snap.length) {
+                if (snap[i].condition(this)) {
+                    setCoords.left = snap[i].pos;
+                    setCoords.right = snap[i].pos +width;
+                    snapped =true;
+                }
+                i++;
+            }
+        }
+        if (!snapped && this._snapX[Math.round(coords.centerX)]) {
+            i = 0;
+            snap = this._snapX[Math.round(coords.centerX)];
+            while (!snapped && i<snap.length) {
+                if (snap[i].condition(this)) {
+                    setCoords.left = snap[i].pos - width/2;
+                    setCoords.right = snap[i].pos +width/2;
+                    snapped =true;
+                }
+                i++;
+            }
+        }
+        if (this._snapX[Math.round(coords.right)]) {
+            i = 0;
+            snap = this._snapX[Math.round(coords.right)];
+            while (!snapped && i<snap.length) {
+                if (snap[i].condition(this)) {
+                    setCoords.left = snap[i].pos - width;
+                    setCoords.right = snap[i].pos;
+                    snapped =true;
+                }
+                i++;
+            }   
+        }
 
-	this.setByBoundingCoords(setCoords);
-	this._updateSnappedLines(setCoords);
+        this.setByBoundingCoords(setCoords);
+        this._updateSnappedLines(setCoords);
     };
 
     fabric_1.fabric.Canvas.prototype._beforeSnapTranform = function(e) {
-	if (e.target) {
-	    var object  =this.getObjectById(e.target.id);
-	    object._prepareSnaps();
-	}
+        if (e.target) {
+            var object  =this.getObjectById(e.target.id);
+            object._prepareSnaps();
+        }
     };
 
     
     fabric_1.fabric.Object.prototype._snapScale = function(e) {
-	var coords = this.getBoundingCoords(true),
-	  //  snaps = this.getSnapPoints(),
-	    snapped = false,
-	    setCoords = coords;
-	var snap;
-	// Snap Y
-	var snapped = false,i;
-	if (this._snapY[Math.round(coords.top)]) {
-	    i = 0;
-	    snap = this._snapY[Math.round(coords.top)];
-	    while (!snapped && i<snap.length) {
-		if (snap[i].condition(this)) {
-		    setCoords.top = snap[i].pos;
-		    snapped = true;
-		}
-		i++;
-	    }
-	}
-	if (!snapped && this._snapY[Math.round(coords.centerY)]) {
-	    i = 0;
-	    snap = this._snapY[Math.round(coords.centerY)];
-	    while (!snapped && i<snap.length) {
-		if (snap[i].condition(this)) {
-		    if (['tl','mt','tr'].includes(e.transform.corner)) {
-			// transforming from top
-			setCoords.top = snap[i].pos - (setCoords.bottom - snap[i].pos);
-		    } else {
-			//transforming from bottom
-			setCoords.bottom = snap[i].pos + (snap[i].pos-setCoords.top);
-		    }
-		    snapped = true;
-		}
-		i++;
-	    }
-	}
-	if (this._snapY[Math.round(coords.bottom)]) {
-	    i = 0;
-	    snap = this._snapY[Math.round(coords.bottom)];
-	    while (!snapped && i<snap.length) {
-		if (snap[i].condition(this)) {
-		    setCoords.bottom = snap[i].pos;
-		    snapped = true;
-		}
-		i++;
-	    }
-	}	
+        var coords = this.getBoundingCoords(true),
+            setCoords = coords,
+            snap,
+            snapped = false,
+            i;
+        
+        // Snap Y
+        if (this._snapY[Math.round(coords.top)]) {
+            i = 0;
+            snap = this._snapY[Math.round(coords.top)];
+            while (!snapped && i<snap.length) {
+                if (snap[i].condition(this)) {
+                    setCoords.top = snap[i].pos;
+                    snapped = true;
+                }
+                i++;
+            }
+        }
+        if (!snapped && this._snapY[Math.round(coords.centerY)]) {
+            i = 0;
+            snap = this._snapY[Math.round(coords.centerY)];
+            while (!snapped && i<snap.length) {
+                if (snap[i].condition(this)) {
+                    if (['tl','mt','tr'].includes(e.transform.corner)) {
+                        // transforming from top
+                        setCoords.top = snap[i].pos - (setCoords.bottom - snap[i].pos);
+                    } else {
+                        //transforming from bottom
+                        setCoords.bottom = snap[i].pos + (snap[i].pos-setCoords.top);
+                    }
+                    snapped = true;
+                }
+                i++;
+            }
+        }
+        if (this._snapY[Math.round(coords.bottom)]) {
+            i = 0;
+            snap = this._snapY[Math.round(coords.bottom)];
+            while (!snapped && i<snap.length) {
+                if (snap[i].condition(this)) {
+                    setCoords.bottom = snap[i].pos;
+                    snapped = true;
+                }
+                i++;
+            }
+        }       
 
-	// Snap X
-	snapped = false;
-	if (this._snapY[Math.round(coords.left)]) {
-	    i = 0;
-	    snap = this._snapY[Math.round(coords.left)];
-	    while (!snapped && i<snap.length) {
-		if (snap[i].condition(this)) {
-		    setCoords.left = snap[i].pos;
-		    snapped = true;
-		}
-		i++;
-	    }
-	}
-	if (!snapped && this._snapY[Math.round(coords.centerX)]) {
-	    i = 0;
-	    snap = this._snapY[Math.round(coords.centerX)];
-	    while (!snapped && i<snap.length) {
-		if (snap[i].condition(this)) {
-		    if (['tl','ml','bl'].includes(e.transform.corner)) {
-			// transforming from left
-			setCoords.left = snap[i].pos - (setCoords.right - snap[i].pos);
-		    } else {
-			//transforming from right
-			setCoords.right = snap[i].pos + (snap[i].pos-setCoords.left);
-		    }
-		    snapped = true;
-		}
-		i++;
-	    }
-	}
-	if (this._snapY[Math.round(coords.right)]) {
-	    i = 0;
-	    snap = this._snapY[Math.round(coords.right)];
-	    while (!snapped && i<snap.length) {
-		if (snap[i].condition(this)) {
-		    setCoords.right = snap[i].pos;
-		    snapped = true;
-		}
-		i++;
-	    }
-	}	
+        // Snap X
+        snapped = false;
+        if (this._snapY[Math.round(coords.left)]) {
+            i = 0;
+            snap = this._snapY[Math.round(coords.left)];
+            while (!snapped && i<snap.length) {
+                if (snap[i].condition(this)) {
+                    setCoords.left = snap[i].pos;
+                    snapped = true;
+                }
+                i++;
+            }
+        }
+        if (!snapped && this._snapY[Math.round(coords.centerX)]) {
+            i = 0;
+            snap = this._snapY[Math.round(coords.centerX)];
+            while (!snapped && i<snap.length) {
+                if (snap[i].condition(this)) {
+                    if (['tl','ml','bl'].includes(e.transform.corner)) {
+                        // transforming from left
+                        setCoords.left = snap[i].pos - (setCoords.right - snap[i].pos);
+                    } else {
+                        //transforming from right
+                        setCoords.right = snap[i].pos + (snap[i].pos-setCoords.left);
+                    }
+                    snapped = true;
+                }
+                i++;
+            }
+        }
+        if (this._snapY[Math.round(coords.right)]) {
+            i = 0;
+            snap = this._snapY[Math.round(coords.right)];
+            while (!snapped && i<snap.length) {
+                if (snap[i].condition(this)) {
+                    setCoords.right = snap[i].pos;
+                    snapped = true;
+                }
+                i++;
+            }
+        }       
 
 
-	setCoords = this.setByBoundingCoords(setCoords);
-	this._updateSnappedLines(setCoords);
+        setCoords = this.setByBoundingCoords(setCoords);
+        this._updateSnappedLines(setCoords);
     };
 
     /**
      * Render active guides
      */
     fabric_1.fabric.Canvas.prototype._renderActiveGuides = function() {
-	var ctx = this.getSelectionContext();
-	 function drawLine(x1, y1, x2, y2, color) {
-	     ctx.save();
-	     ctx.lineWidth = 1;
-	     ctx.strokeStyle = color;
-	     ctx.beginPath();
-	     ctx.moveTo(x1, y1);
-	     ctx.lineTo(x2,y2);
-	     ctx.stroke();
-	     ctx.restore();
-	 }
+        var ctx = this.getSelectionContext();
+        function drawLine(x1, y1, x2, y2, color) {
+            ctx.save();
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2,y2);
+            ctx.stroke();
+            ctx.restore();
+        }
 
-	if (!this.getActiveObject()){
-	    return;
-	}
-	for (var i = 0 ; i< this._snappedLines.length; i++){
-	    var render = this._snappedLines[i].renderActive;
-	    if (render) {
-		if ('h' == this._snappedLines[i].direction){
-		    var lr = render(this.getActiveObject());
-		    if (lr.left && lr.right) {
-			var y = this._snappedLines[i].pos;
-			drawLine(lr.left,y,lr.right,y, lr.color? lr.color: 'green');
-		    }
-		} else if ('v' == this._snappedLines[i].direction){
-		    var lr = render(this.getActiveObject());
-		    if (lr.top && lr.bottom) {
-			var x = this._snappedLines[i].pos;
-			drawLine(x,lr.top,x,lr.bottom, lr.color? lr.color: 'green');
-		    }
-		}
+        if (!this.getActiveObject()){
+            return;
+        }
+        for (var i = 0 ; i< this._snappedLines.length; i++){
+            var render = this._snappedLines[i].renderActive;
+            if (render) {
+                if ('h' == this._snappedLines[i].direction){
+                    var lr = render(this.getActiveObject());
+                    if (lr.left && lr.right) {
+                        var y = this._snappedLines[i].pos;
+                        drawLine(lr.left,y,lr.right,y, lr.color? lr.color: 'green');
+                    }
+                } else if ('v' == this._snappedLines[i].direction){
+                    var tb = render(this.getActiveObject());
+                    if (tb.top && tb.bottom) {
+                        var x = this._snappedLines[i].pos;
+                        drawLine(x,lr.top,x,lr.bottom, lr.color? lr.color: 'green');
+                    }
+                }
 
-	    }
-	}
-	
+            }
+        }
+        
     };
     /**
      * Override the initialize function to add events
      */
     fabric_1.fabric.Canvas.prototype.initialize = (function(originalFn) {
-	return function(...args) {
-	    originalFn.call(this, ...args);
-	    this.on({
-		'mouse:down': this._beforeSnapTranform,
-		'before:render': function(e) {
-		    this.clearContext(this.contextTop);
-		}.bind(this),
-		'after:render':this._renderActiveGuides,
-		
-	    });
-	    return this;
-	};
+        return function(...args) {
+            originalFn.call(this, ...args);
+            this.on({
+                'mouse:down': this._beforeSnapTranform,
+                'before:render': function() {
+                    this.clearContext(this.contextTop);
+                }.bind(this),
+                'after:render':this._renderActiveGuides,
+                
+            });
+            return this;
+        };
     })(fabric_1.fabric.Canvas.prototype.initialize);
     
     /**
      * Add Object snapping listeners
      */
     fabric_1.fabric.Object.prototype.doesSnap = function() {
-	this.on({'moving':this._snapMove,
-	       'scaling': this._snapScale});
+        this.on({'moving':this._snapMove,
+                 'scaling': this._snapScale});
     };
 
 }
 
 function fabricAddSmartGuides() {
     if (fabric_1.fabric.Canvas.prototype._smartGuidesAttached) {
-	return;
+        return;
     }
 
     if (!fabric_1.fabric.Canvas.prototype._snapperAttached) {
-	fabricAddSnapper();
+        fabricAddSnapper();
     }
 
-        
+    function renderHorizontal(bounds,center) {
+        return (target) => {
+            var coords ={left:0,right:0,color:'red'};
+            var targetBounds = target.getBoundingCoords();
+
+            if (center) {
+                coords.left = Math.min(targetBounds.centerX,bounds.centerX);
+                coords.right = Math.max(targetBounds.centerX,bounds.centerX);
+            } else {
+                coords.left = Math.min(targetBounds.left,bounds.left);
+                coords.right = Math.max(targetBounds.right,bounds.right);
+            }
+            return coords;
+        }
+    }
+
+    function renderVertical(bounds,center) {
+        return (target) => {
+            var coords ={top:0,bottom:0,color:'red'};
+            var targetBounds = target.getBoundingCoords();
+
+            if (center) {
+                coords.top = Math.min(targetBounds.centerY,bounds.centerY);
+                coords.bottom = Math.max(targetBounds.centerY,bounds.centerY);
+            } else {
+                coords.top = Math.min(targetBounds.top,bounds.top);
+                coords.bottom = Math.max(targetBounds.bottom,bounds.bottom);
+            }
+            return coords;
+        }
+    }
+    
+    function valid(obj) {
+        return (o) =>{return o.id !== obj.id}
+    }
 
     fabric_1.fabric.Canvas.prototype._getSmartGuides = function() {
-	var canvasObjects = this.getObjects(),
-	    bounds,
-	    snapper,
-	    snappers = [];
-	
-	
-	for (var i = canvasObjects.length; i--;) {
-	    var obj = canvasObjects[i];
-	    bounds = obj.getBoundingCoords();
-	    function valid(obj) {
-		return (o) =>{return o.id !== obj.id}
-	    }
-	    
-	    function renderHorizontal(bounds,center) {
-		return (target) => {
-		    var coords ={left:0,right:0,color:'red'};
-		    var targetBounds = target.getBoundingCoords();
+        var canvasObjects = this.getObjects(),
+            bounds,
+            snapper,
+            snappers = [];
+            
+        for (var i = canvasObjects.length; i--;) {
+            var obj = canvasObjects[i];
+            bounds = obj.getBoundingCoords();
+    
+            ['top', 'centerY', 'bottom'].forEach((key) => {
+                snapper = { 'y': bounds[key],
+                            'validTarget': valid(obj),
+                            'condition': () => {return true},
+                            'margin': 10,
+                            'renderActive': renderHorizontal(bounds, 'centerY' == key),
+                          };
+                snappers.push(snapper);
+            });
+            ['left', 'centerX', 'right'].forEach((key) => {
+                snapper = { 'x': bounds[key],
+                            'validTarget': valid(obj),
+                            'condition': () => {return true},
+                            'margin': 10,
+                            'renderActive': renderVertical(bounds, 'centerX' == key),
+                          };
+                snappers.push(snapper);
+            });
 
-		    if (center) {
-			coords.left = Math.min(targetBounds.centerX,bounds.centerX);
-			coords.right = Math.max(targetBounds.centerX,bounds.centerX);
-		    } else {
-			coords.left = Math.min(targetBounds.left,bounds.left);
-			coords.right = Math.max(targetBounds.right,bounds.right);
-		    }
-		    return coords;
-		}
-	    }
-
-	    function renderVertical(bounds,center) {
-		return (target) => {
-		    var coords ={top:0,bottom:0,color:'red'};
-		    var targetBounds = target.getBoundingCoords();
-
-		    if (center) {
-			coords.top = Math.min(targetBounds.centerY,bounds.centerY);
-			coords.bottom = Math.max(targetBounds.centerY,bounds.centerY);
-		    } else {
-			coords.top = Math.min(targetBounds.top,bounds.top);
-			coords.bottom = Math.max(targetBounds.bottom,bounds.bottom);
-		    }
-		    return coords;
-		}
-	    }
-
-	    ['top', 'centerY', 'bottom'].forEach((key) => {
-		snapper = { 'y': bounds[key],
-			    'validTarget': valid(obj),
-			    'condition': function(o) {return true},
-			    'margin': 10,
-			    'renderActive': renderHorizontal(bounds, 'centerY' == key),
-			  };
-		snappers.push(snapper);
-	    });
-	    ['left', 'centerX', 'right'].forEach((key) => {
-		snapper = { 'x': bounds[key],
-			    'validTarget': valid(obj),
-			    'condition': (o) => {return true},
-			    'margin': 10,
-			    'renderActive': renderVertical(bounds, 'centerX' == key),
-			  };
-		snappers.push(snapper);
-	    });
-
-	}
-	return snappers;
+        }
+        return snappers;
 
     };
 
-						
+    
 
 
     fabric_1.fabric.Canvas.prototype._smartGuidesAttached = true;
