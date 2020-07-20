@@ -1,0 +1,179 @@
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/gh/fabricjs/fabric.js@v3.6.3/dist/fabric.min.js"></script>
+    <script src=""></script>
+  </head>
+  <body>
+
+    <h1> Smart Guides Test </h1>
+
+    <canvas id="c4" width="800" height="800">
+    </canvas>
+    <script type="module">
+      import {fabricAddSnapper,fabricAddSmartGuides} from 'https://cdn.jsdelivr.net/gh/mtrudw/fabricPublisherTools/dist/fabricPublisherTools.js';
+      fabricAddSnapper();
+      fabricAddSmartGuides();
+      var canvas = new fabric.Canvas('c4');
+      var rect = new fabric.Rect({left: 100,top:100,width:150,height:100,fill:'blue'});
+      var rect2 = new fabric.Rect({left: 500,top:500,width:150,height:100,fill:'green'});
+      var rect3 = new fabric.Rect({left: 400,top:200,width:150,height:100,fill:'yellow'});
+      canvas._registerSnaps(canvas._getSmartGuides.bind(canvas));
+      rect.doesSnap();
+      rect2.doesSnap();
+      rect3.doesSnap();
+      canvas.add(rect,rect2,rect3);
+    </script>
+
+
+    <h1> Snap Test </h1>
+
+    <canvas id="c3" width="800" height="800">
+    </canvas>
+    <script type="module">
+      import {fabricAddSnapper} from 'https://cdn.jsdelivr.net/gh/mtrudw/fabricPublisherTools/dist/fabricPublisherTools.js';
+      fabricAddSnapper();
+      var canvas = new fabric.Canvas('c3');
+       function makeLine(coords) {
+	   return new fabric.Line(coords, {
+	       fill: 'red',
+	       stroke: 'red',
+	       strokeWidth: 4,
+	       selectable: false,
+	       evented: false,
+	   });
+       }
+      var lineHCenter = makeLine([0,398,800,398]),
+	  lineVCenter = makeLine([398,0,398,800]),
+          lineVLeft = makeLine([98,0,98,800]);
+
+      var rect = new fabric.Rect({left: 100,top:100,width:150,height:100,fill:'blue'});
+      canvas._registerSnaps(()=>{return [{ x: 400,
+					   validTarget: (obj) => {return true},
+					   condition: (obj) => {return true},
+					   margin: 8
+					 },
+					 { x: 100,
+					   validTarget: (obj) => {return true},
+					   condition: (obj) => {return true},
+					   margin: 8
+					 },
+					]
+				}
+			   );
+      canvas._registerSnaps(()=>{ return [{ y: 400,
+					    validTarget: (obj) => {return true},
+					    condition: (obj) => {return true},
+					    margin: 8
+					  }]
+				});
+
+      rect.doesSnap();
+      canvas.add(lineHCenter,lineVLeft,lineVCenter,rect);
+    </script>
+
+
+	
+    <h1> Bounds Test</h1>
+    <canvas id="c2" width="800" height="800">
+    </canvas>
+    <script type="module">
+      import {fabricAddSnapper} from 'https://cdn.jsdelivr.net/gh/mtrudw/fabricPublisherTools/dist/fabricPublisherTools.js';
+      fabricAddSnapper();
+      var canvas2 = new fabric.Canvas('c2');
+
+       function makeLine(coords) {
+	   return new fabric.Line(coords, {
+	       fill: 'red',
+	       stroke: 'red',
+	       strokeWidth: 5,
+	       selectable: false,
+	       evented: false,
+	   });
+
+       }
+
+      var rect = new fabric.Rect({left:100, top:100,width:300,height:300});
+
+      canvas2.add(rect);
+      var coords = rect.getBoundingCoords();
+      var hlineT = makeLine([0,coords.top,800,coords.top]);
+      var vlineL = makeLine([coords.left,0,coords.left,800]);
+
+      var hlineB = makeLine([0,coords.bottom,800,coords.bottom]);
+      var vlineR = makeLine([coords.right,0,coords.right,800]);
+      var tlCorn = new fabric.Circle({
+	  top: rect.aCoords.tl.y,
+	  left : rect.aCoords.tl.x,
+	  radius : 5,
+	  fill: 'blue'
+      });
+      canvas2.add(hlineT,vlineL,hlineB,vlineR,tlCorn);
+      function updating(e) {
+	  var p = e.target;
+	  coords = rect.getBoundingCoords(true);
+	  
+	  hlineT.set({'y1':coords.top,'y2':coords.top});
+	  vlineL.set({'x1':coords.left,'x2':coords.left});
+
+	  hlineB.set({'y1':coords.bottom,'y2':coords.bottom});
+	  vlineR.set({'x1':coords.right,'x2':coords.right});
+	  tlCorn.set({'top':rect.aCoords.tl.y, 'left':rect.aCoords.tl.x});
+	  canvas2.renderAll();
+      }
+      canvas2.on({'object:moving':updating,
+		  'object:scaling': updating,
+		  'object:rotating': updating});
+    </script>
+    
+    <h1> Undo Redo Test</h1>
+    <canvas id="c1" width="800" height="500">
+    </canvas>
+    <button id="log">Log Canvas</button>
+    <button id="undo">Undo</button>
+    <button id="redo">Redo</button>
+    <button id="ranCol">Random Color</button>
+    <button id="delete">Delete</button>
+     <script type="module">
+
+       import {fabricAddObjectIDs, fabricAddUndoRedo} from 'https://cdn.jsdelivr.net/gh/mtrudw/fabricPublisherTools/dist/fabricPublisherTools.js';
+       fabricAddObjectIDs()
+       fabricAddUndoRedo();
+       var canvas1 = new fabric.Canvas('c1');
+       var rect
+       for (var i = 0; i < 10; i++) {
+	   rect = new fabric.Rect({
+	       width: 10,
+	       height: 10,
+	       left: i * 15,
+	       top: i * 15,
+	   });
+	   canvas1.add(rect);
+       }
+
+      
+       function logJSON() {
+	   console.log(canvas1.toJSON());
+       }
+       function getRandomColor() {
+	   var letters = '0123456789ABCDEF';
+	   var color = '#';
+	   for (var i = 0; i < 6; i++) {
+	       color += letters[Math.floor(Math.random() * 16)];
+	   }
+	   return color;
+       }
+       document.querySelector("#log").addEventListener('click',logJSON);
+       document.querySelector("#undo").addEventListener('click',(e)=>{canvas1.undo()});
+       document.querySelector("#redo").addEventListener('click',(e)=>{canvas1.redo()});
+       document.querySelector("#delete").addEventListener('click',(e)=>{canvas1.getActiveObject() && canvas1.remove(canvas1.getActiveObject())});
+       document.querySelector("#ranCol").addEventListener('click',(e)=>{
+	   canvas1.getActiveObject() && canvas1.getActiveObject().set('fill',getRandomColor());
+	   canvas1.renderAll();});
+       
+     </script>
+
+    
+
+  </body>
+</html>
+
