@@ -5,12 +5,12 @@
     "license": "MIT",
     "homepage": "https://github.com/mtrudw/fabricPublisherTools",
     "bugs": {
-	"url": "https://github.com/mtrudw/fabricPublisherTools/issues"
+        "url": "https://github.com/mtrudw/fabricPublisherTools/issues"
     },
     "author": "Matthias Trudewind matthias@trudewind.org",
     "repository": {
-	"type": "git",
-	"url": "https://github.com/mtrudw/fabricPublisherTools.git"
+        "type": "git",
+        "url": "https://github.com/mtrudw/fabricPublisherTools.git"
     },
     "devDependencies": {
         "@babel/preset-env": "^7.10.4",
