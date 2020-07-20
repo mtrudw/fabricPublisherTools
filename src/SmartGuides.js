@@ -72,7 +72,7 @@ function fabricAddSmartGuides() {
 			    'validTarget': valid(obj),
 			    'condition': (o) => {return true},
 			    'margin': 10,
-			    'renderActive': renderVertical(bounds, 'centerY' == key),
+			    'renderActive': renderVertical(bounds, 'centerX' == key),
 			  };
 		snappers.push(snapper);
 	    });

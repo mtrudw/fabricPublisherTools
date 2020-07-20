@@ -30232,7 +30232,7 @@ function fabricAddSnapper() {
 	['left', 'centerX', 'right'].forEach((key) => {
 	    if (this._snapX[Math.round(coords[key])]) {
 		this._snapX[Math.round(coords[key])].forEach((obj) =>{
-		    if (Math.abs(obj.pos - coords[key])<5) {
+		    if (Math.abs(obj.pos - coords[key])<2) {
 			obj.direction = 'v';
 			this.canvas._snappedLines.push(obj);
 		    }
