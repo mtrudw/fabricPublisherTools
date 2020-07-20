@@ -5,8 +5,8 @@
   </head>
   <body>
 
-    <h1> Smart Guides Test </h1>
-
+    <h1> Smart Guides </h1>
+    Move to align with other objects
     <canvas id="c4" width="800" height="800">
     </canvas>
     <script type="module">
@@ -25,8 +25,8 @@
     </script>
 
 
-    <h1> Snap Test </h1>
-
+    <h1> Snap </h1>
+    Snap rectangle to lines
     <canvas id="c3" width="800" height="800">
     </canvas>
     <script type="module">
@@ -72,60 +72,24 @@
     </script>
 
 
-	
-    <h1> Bounds Test</h1>
-    <canvas id="c2" width="800" height="800">
+    <h1> Image Container </h1>
+    Double Click to scale image
+    <canvas id="c5" width="800" height="800">
     </canvas>
     <script type="module">
-      import {fabricAddSnapper} from 'https://cdn.jsdelivr.net/gh/mtrudw/fabricPublisherTools/dist/fabricPublisherTools.js';
-      fabricAddSnapper();
-      var canvas2 = new fabric.Canvas('c2');
-
-       function makeLine(coords) {
-	   return new fabric.Line(coords, {
-	       fill: 'red',
-	       stroke: 'red',
-	       strokeWidth: 5,
-	       selectable: false,
-	       evented: false,
-	   });
-
-       }
-
-      var rect = new fabric.Rect({left:100, top:100,width:300,height:300});
-
-      canvas2.add(rect);
-      var coords = rect.getBoundingCoords();
-      var hlineT = makeLine([0,coords.top,800,coords.top]);
-      var vlineL = makeLine([coords.left,0,coords.left,800]);
-
-      var hlineB = makeLine([0,coords.bottom,800,coords.bottom]);
-      var vlineR = makeLine([coords.right,0,coords.right,800]);
-      var tlCorn = new fabric.Circle({
-	  top: rect.aCoords.tl.y,
-	  left : rect.aCoords.tl.x,
-	  radius : 5,
-	  fill: 'blue'
-      });
-      canvas2.add(hlineT,vlineL,hlineB,vlineR,tlCorn);
-      function updating(e) {
-	  var p = e.target;
-	  coords = rect.getBoundingCoords(true);
-	  
-	  hlineT.set({'y1':coords.top,'y2':coords.top});
-	  vlineL.set({'x1':coords.left,'x2':coords.left});
-
-	  hlineB.set({'y1':coords.bottom,'y2':coords.bottom});
-	  vlineR.set({'x1':coords.right,'x2':coords.right});
-	  tlCorn.set({'top':rect.aCoords.tl.y, 'left':rect.aCoords.tl.x});
-	  canvas2.renderAll();
-      }
-      canvas2.on({'object:moving':updating,
-		  'object:scaling': updating,
-		  'object:rotating': updating});
+      import {ImageContainer} from 'https://cdn.jsdelivr.net/gh/mtrudw/fabricPublisherTools/dist/fabricPublisherTools.js';
+      var canvas = new fabric.Canvas('c4');
+      var imgContainer = new fabric.ImageContainer({ left: 100,
+						     right: 100,
+						     width : 600,
+						     height: 600,
+						   });
+      canvas.add(imgContainer);
+      imgContainer.loadImage('https://unsplash.com/photos/zPTq--yOK2Y/download?force=true&w=1920');
     </script>
-    
-    <h1> Undo Redo Test</h1>
+
+	
+    <h1> Undo Redo</h1>
     <canvas id="c1" width="800" height="500">
     </canvas>
     <button id="log">Log Canvas</button>
