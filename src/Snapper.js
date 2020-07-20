@@ -324,6 +324,28 @@ function fabricAddSnapper() {
 	this.setByBoundingCoords(setCoords);
 
     }
+
+    /**
+     * Override the initialize function to add events
+     */
+    fabric.Canvas.prototype.initialize = (function(originalFn) {
+	return function(...args) {
+	    originalFn.call(this, ...args);
+	    this.on({
+		'mouse:down': this._beforeSnapTranform,
+	    });
+	    return this;
+	};
+    })(fabric.Canvas.prototype.initialize);
+    
+    /**
+     * Add Object snapping listeners
+     */
+    fabric.Object.prototype.doesSnap = function() {
+	this.on({'moving':this._snapMove,
+	       'scaling': this._snapScale});
+    }
+
 }
 
 export {fabricAddSnapper};
