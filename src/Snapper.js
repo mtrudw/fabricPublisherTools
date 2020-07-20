@@ -33,6 +33,12 @@ function fabricAddSnapper() {
 	return bounds;
     }
 
+    /**
+     * @function object.setByBoundingCoords
+     * Sets object position and scale to fit inside the given bounding box. Does override the given center
+     *
+     */
+
     fabric.Object.prototype.setByBoundingCoords = function(coords) {
 	var angle = this.angle > 180 ? 360-this.angle : this.angle;
 	angle = angle > 90 ? 180 - angle : angle;
@@ -44,6 +50,8 @@ function fabricAddSnapper() {
 	    boundHeight = coords.bottom-coords.top,
 	    boundWidth = coords.right-coords.left;
 	var tempStroke = this.strokeWidth;
+	coords.centerY = coords.top + (coords.bottom-coords.top)/2;
+	coords.centerX = coords.left + (coords.right-coords.left)/2;
 	if (0 !== cos2t) {
 	    this.scaleY = (boundHeight*cos-boundWidth*sin)/cos2t / this.height;
 	    this.scaleX = (boundWidth*cos-boundHeight*sin)/cos2t / this.width;
@@ -84,32 +92,26 @@ function fabricAddSnapper() {
 	if (inRange(coords.top,snaps.v[0],this.snapMargin)) {
 	    setCoords.top = snaps.v[0];
 	    setCoords.bottom = snaps.v[0] +height;
-	    setCoords.centerY = snaps.v[0] + height/2;
 	}
 	else if (inRange(coords.centerY,snaps.v[0],this.snapMargin)) {
 	    setCoords.top = snaps.v[0] - height/2;
 	    setCoords.bottom = snaps.v[0] + height/2;
-	    setCoords.centerY = snaps.v[0];
 	} else if (inRange(coords.bottom,snaps.v[0],this.snapMargin)) {
 	    setCoords.top = snaps.v[0] - height;
 	    setCoords.bottom = snaps.v[0];
-	    setCoords.centerY = snaps.v[0]-height/2;
 	}
 
 	//snap X
 	if (inRange(coords.left,snaps.h[0],this.snapMargin)) {
 	    setCoords.left = snaps.h[0];
 	    setCoords.right = snaps.h[0] +width;
-	    setCoords.centerX = snaps.h[0] + width/2;
 	}
 	else if (inRange(coords.centerX,snaps.h[0],this.snapMargin)) {
 	    setCoords.left = snaps.h[0] - width/2;
 	    setCoords.right = snaps.h[0] + width/2;
-	    setCoords.centerX = snaps.h[0];
 	} else if (inRange(coords.right,snaps.h[0],this.snapMargin)) {
 	    setCoords.left = snaps.h[0] - width;
 	    setCoords.right = snaps.h[0];
-	    setCoords.centerX = snaps.h[0]-width/2;
 	}
 	    
 	this.setByBoundingCoords(setCoords);
@@ -123,36 +125,46 @@ function fabricAddSnapper() {
 	}
     }
     
-    fabric.Object.prototype._snapScale = function() {
+    fabric.Object.prototype._snapScale = function(e) {
 	var coords = this.getBoundingCoords(true),
 	    snaps = this.getSnapPoints(),
 	    snapped = false,
 	    setCoords = coords,
 	    height = 0;
 	
-
 	function inRange (x1,x2,range) {
 	    return Math.abs(x1 - x2) <= range;
 	}
-
 	// Snap Y
 	if (inRange(coords.top,snaps.v[0],this.snapMargin)) {
 	    setCoords.top = snaps.v[0];
-	    setCoords.centerY = setCoords.top + (setCoords.bottom-setCoords.top)/2;
+	} else if(inRange(coords.centerY,snaps.v[0],this.snapMargin)) {
+	    if (['tl','mt','tr'].includes(e.transform.corner)) {
+		// transforming from top
+		setCoords.top = snaps.v[0] - (setCoords.bottom - snaps.v[0]);
+	    } else {
+		//transforming from bottom
+		setCoords.bottom = snaps.v[0] + (snaps.v[0]-setCoords.top);
+	    }
 	}
 	else if (inRange(coords.bottom,snaps.v[0],this.snapMargin)) {
 	    setCoords.bottom = snaps.v[0];
-	    setCoords.centerY = setCoords.bottom - (setCoords.bottom-setCoords.top)/2;
 	}	
 
 	// Snap X
 	if (inRange(coords.left,snaps.h[0],this.snapMargin)) {
 	    setCoords.left = snaps.h[0];
-	    setCoords.centerX = setCoords.left + (setCoords.right-setCoords.left)/2;
+	} else if(inRange(coords.centerX,snaps.h[0],this.snapMargin)) {
+	    if (['tl','ml','bl'].includes(e.transform.corner)) {
+		// transforming from left
+		setCoords.left = snaps.h[0] - (setCoords.right - snaps.h[0]);
+	    } else {
+		//transforming from bottom
+		setCoords.right = snaps.h[0] + (snaps.h[0]-setCoords.left);
+	    }
 	}
 	else if (inRange(coords.right,snaps.h[0],this.snapMargin)) {
 	    setCoords.right = snaps.v[0];
-	    setCoords.centerX = setCoords.right - (setCoords.right-setCoords.left)/2;
 	}	
 
 	this.setByBoundingCoords(setCoords);
