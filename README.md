@@ -1,6 +1,6 @@
 # Collection of Extensions for [fabric.js](https://github.com/fabricjs/fabric.js)
 
-A set of modular extensions to give [fabric.js](https://github.com/fabricjs/fabric.js) some additional DTP like capabilities:
+A set of modular extensions to give [fabric.js](https://github.com/fabricjs/fabric.js) some additional DTP like capabilities.
 
 ## Demo
 https://mtrudw.github.io/fabricPublisherTools/.
