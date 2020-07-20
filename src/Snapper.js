@@ -34,16 +34,27 @@ function fabricAddSnapper() {
     }
 
     fabric.Object.prototype.setByBoundingCoords = function(coords) {
-	var theta = fabric.util.degreesToRadians(this.angle),
+	var angle = this.angle > 180 ? 360-this.angle : this.angle;
+	angle = angle > 90 ? 180 - angle : angle;
+	
+	var theta = fabric.util.degreesToRadians(angle),
             cos = fabric.util.cos(theta),
             sin = fabric.util.sin(theta),
 	    cos2t = fabric.util.cos(2*theta),
 	    boundHeight = coords.bottom-coords.top,
 	    boundWidth = coords.right-coords.left;
 	var tempStroke = this.strokeWidth;
+	if (0 !== cos2t) {
+	    this.scaleY = (boundHeight*cos-boundWidth*sin)/cos2t / this.height;
+	    this.scaleX = (boundWidth*cos-boundHeight*sin)/cos2t / this.width;
+	} else {
+	    var aspect = (this.width*this.scaleX)/(this.height*this.scaleY),
+		calcHeight = boundHeight/((aspect + 1)*cos);
+	    this.scaleY = calcHeight / this.height;
+	    this.scaleX = aspect *calcHeight / this.width;
+	}
+
 	this.strokeWidth = 0;
-	this.scaleY = (boundHeight*cos-boundWidth*sin)/cos2t / this.width;
-	this.scaleX = (boundWidth*cos-boundHeight*sin)/cos2t / this.height;
 
 	this.setCoords();
 	this.setPositionByOrigin(new fabric.Point(coords.centerX, coords.centerY),'center','center');
@@ -139,7 +150,7 @@ function fabricAddSnapper() {
 	    setCoords.left = snaps.h[0];
 	    setCoords.centerX = setCoords.left + (setCoords.right-setCoords.left)/2;
 	}
-	else if (inRange(coords.right,snaps.v[0],this.snapMargin)) {
+	else if (inRange(coords.right,snaps.h[0],this.snapMargin)) {
 	    setCoords.right = snaps.v[0];
 	    setCoords.centerX = setCoords.right - (setCoords.right-setCoords.left)/2;
 	}	
