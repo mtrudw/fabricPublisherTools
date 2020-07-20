@@ -379,7 +379,7 @@ function fabricAddSnapper() {
                     var tb = render(this.getActiveObject());
                     if (tb.top && tb.bottom) {
                         var x = this._snappedLines[i].pos;
-                        drawLine(x,lr.top,x,lr.bottom, lr.color? lr.color: 'green');
+                        drawLine(x,tb.top,x,tb.bottom, tb.color? tb.color: 'green');
                     }
                 }
 
