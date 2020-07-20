@@ -7,7 +7,7 @@ export default {
     
   input: 'src/index.js',
   output: {
-    file: 'dist/fabricPublisher.js',
+    file: 'dist/fabricPublisherTools.js',
     format: 'esm'
   },
     

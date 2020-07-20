@@ -12,7 +12,7 @@
 /coverage
 
 # production
-/dist
+/dist/index.html
 /docs
 
 # misc
