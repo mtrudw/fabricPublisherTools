@@ -11,10 +11,11 @@ function fabricAddSnapper() {
     }
 
     fabric.Canvas.prototype._snapperAttached = true;
-    fabric.Canvas.prototype.snapPoints =[];
+    fabric.Canvas.prototype._registeredSnappers = [];
     fabric.Object.prototype.snapMargin =4;
-    fabric.Object.prototype.lastValidBounds = null;
-
+    fabric.Object.prototype._snapX = [];
+    fabric.Object.prototype._snapY = [];
+    
     fabric.Object.prototype.getBoundingCoords = function(calc) {
 	var tempStroke = this.strokeWidth;
 	this.strokeWidth = 0;
@@ -70,64 +71,163 @@ function fabricAddSnapper() {
 	this.strokeWidth = tempStroke;
     }
     
-    fabric.Object.prototype.getSnapPoints = function() {
-	return {'h':[400,800] , 'v':[400,800]};
+    fabric.Canvas.prototype._registerSnaps = function(provider) {
+	if (provider && {}.toString.call(provider) === '[object Function]') {
+	    this._registeredSnappers.push(provider);
+	    return true;
+	} else {
+	    return false;
+	}
     }
 
+    fabric.Canvas.prototype._unregisterSnaps = function(provider) {
+
+    }
+    
+    fabric.Object.prototype._prepareSnaps =  function() {
+	var snaps= null,
+	    snap = null;
+	var snapObj = null;
+	this._snapX.length = Math.ceil(this.canvas.width);
+	this._snapY.length = Math.ceil(this.canvas.height);
+	this._snapX = this._snapX.fill(false,0,Math.ceil(this.canvas.width));
+	this._snapY = this._snapY.fill(false,0,Math.ceil(this.canvas.height));
+	for (var i =0;i< this.canvas._registeredSnappers.length; i++) {
+	    snaps = this.canvas._registeredSnappers[i]();
+	    for (var j = 0; j<snaps.length;j++) {
+		snap = snaps[j];
+		if (snap.validTarget && ! snap.validTarget(this)) {
+		    continue;
+		}
+		
+		if (snap.x || snap.y) {
+		    snapObj = {pos:  snap.x ? snap.x : snap.y,
+			       condition: snap.condition}
+		} else {
+		    continue;
+		}
+		if (snap.x) {
+		    for (var k = Math.floor(snap.x - snap.margin/2); k<Math.ceil(snap.x + snap.margin/2); k++) {
+			if (!this._snapX[k]) {
+			    this._snapX[k] = [snapObj];
+			} else {
+			    this._snapX[k].push([snapObj]);
+			}
+		    }
+		} else {
+		    for (var k = Math.floor(snap.y - snap.margin/2); k<Math.ceil(snap.y + snap.margin/2); k++) {
+			if (!this._snapY[k]) {
+			    this._snapY[k] = [snapObj];
+			} else {
+			    this._snapY[k].push(snapObj);
+			}
+		    }
+		    
+		}
+	    }
+	}
+    }
     
     
     fabric.Object.prototype._snapMove = function() {
 	var coords = this.getBoundingCoords(true),
-	    snaps = this.getSnapPoints(),
+
 	    height = coords.bottom - coords.top,
 	    width = coords.right-coords.left;
 	var setCoords = coords;
-
-	function inRange (x1,x2,range) {
-	    return Math.abs(x1 - x2) <= range;
-	}
-
-
+	var snaps,snap;
 	//snap Y
-	if (inRange(coords.top,snaps.v[0],this.snapMargin)) {
-	    setCoords.top = snaps.v[0];
-	    setCoords.bottom = snaps.v[0] +height;
+
+	var snapped = false,i;
+	if (this._snapY[Math.round(coords.top)]) {
+	    i = 0;
+	    snap = this._snapY[Math.round(coords.top)];
+	    while (!snapped && i<snap.length) {
+		if (snap[i].condition(this)) {
+		    setCoords.top = snap[i].pos;
+		    setCoords.bottom = snap[i].pos +height;
+		    snapped =true;
+		}
+		i++;
+	    }
 	}
-	else if (inRange(coords.centerY,snaps.v[0],this.snapMargin)) {
-	    setCoords.top = snaps.v[0] - height/2;
-	    setCoords.bottom = snaps.v[0] + height/2;
-	} else if (inRange(coords.bottom,snaps.v[0],this.snapMargin)) {
-	    setCoords.top = snaps.v[0] - height;
-	    setCoords.bottom = snaps.v[0];
+	if (!snapped && this._snapY[Math.round(coords.centerY)]) {
+	    i = 0;
+	    snap = this._snapY[Math.round(coords.centerY)];
+	    while (!snapped && i<snap.length) {
+		if (snap[i].condition(this)) {
+		    setCoords.top = snap[i].pos - height/2;
+		    setCoords.bottom = snap[i].pos +height/2;
+		    snapped =true;
+		}
+		i++;
+	    }
+	}
+	if (this._snapY[Math.round(coords.bottom)]) {
+	    i = 0;
+	    snap = this._snapY[Math.round(coords.bottom)];
+	    while (!snapped && i<snap.length) {
+		if (snap[i].condition(this)) {
+		    setCoords.top = snap[i].pos - height;
+		    setCoords.bottom = snap[i].pos;
+		    snapped =true;
+		}
+		i++;
+	    }	
 	}
 
 	//snap X
-	if (inRange(coords.left,snaps.h[0],this.snapMargin)) {
-	    setCoords.left = snaps.h[0];
-	    setCoords.right = snaps.h[0] +width;
+	snapped =false;
+	if (this._snapX[Math.round(coords.left)]) {
+	    i = 0;
+	    snap = this._snapX[Math.round(coords.left)];
+	    while (!snapped && i<snap.length) {
+		if (snap[i].condition(this)) {
+		    setCoords.left = snap[i].pos;
+		    setCoords.right = snap[i].pos +width;
+		    snapped =true;
+		}
+		i++;
+	    }
 	}
-	else if (inRange(coords.centerX,snaps.h[0],this.snapMargin)) {
-	    setCoords.left = snaps.h[0] - width/2;
-	    setCoords.right = snaps.h[0] + width/2;
-	} else if (inRange(coords.right,snaps.h[0],this.snapMargin)) {
-	    setCoords.left = snaps.h[0] - width;
-	    setCoords.right = snaps.h[0];
+	if (!snapped && this._snapX[Math.round(coords.centerX)]) {
+	    i = 0;
+	    snap = this._snapX[Math.round(coords.centerX)];
+	    while (!snapped && i<snap.length) {
+		if (snap[i].condition(this)) {
+		    setCoords.left = snap[i].pos - width/2;
+		    setCoords.right = snap[i].pos +width/2;
+		    snapped =true;
+		}
+		i++;
+	    }
 	}
-	    
+	if (this._snapX[Math.round(coords.right)]) {
+	    i = 0;
+	    snap = this._snapX[Math.round(coords.right)];
+	    while (!snapped && i<snap.length) {
+		if (snap[i].condition(this)) {
+		    setCoords.left = snap[i].pos - width;
+		    setCoords.right = snap[i].pos;
+		    snapped =true;
+		}
+		i++;
+	    }	
+	}
+
 	this.setByBoundingCoords(setCoords);
     }
 
     fabric.Canvas.prototype._beforeSnapTranform = function(e) {
 	if (e.target) {
 	    var object  =this.getObjectById(e.target.id)
-	    object.lastValidBounds = object.getBoundingCoords(true);
-	    console.log(object.lastValidBounds);
+	    object._prepareSnaps();
 	}
     }
     
     fabric.Object.prototype._snapScale = function(e) {
 	var coords = this.getBoundingCoords(true),
-	    snaps = this.getSnapPoints(),
+	  //  snaps = this.getSnapPoints(),
 	    snapped = false,
 	    setCoords = coords,
 	    height = 0;
@@ -135,37 +235,91 @@ function fabricAddSnapper() {
 	function inRange (x1,x2,range) {
 	    return Math.abs(x1 - x2) <= range;
 	}
+	var snaps,snap;
 	// Snap Y
-	if (inRange(coords.top,snaps.v[0],this.snapMargin)) {
-	    setCoords.top = snaps.v[0];
-	} else if(inRange(coords.centerY,snaps.v[0],this.snapMargin)) {
-	    if (['tl','mt','tr'].includes(e.transform.corner)) {
-		// transforming from top
-		setCoords.top = snaps.v[0] - (setCoords.bottom - snaps.v[0]);
-	    } else {
-		//transforming from bottom
-		setCoords.bottom = snaps.v[0] + (snaps.v[0]-setCoords.top);
+	var snapped = false,i;
+	if (this._snapY[Math.round(coords.top)]) {
+	    i = 0;
+	    snap = this._snapY[Math.round(coords.top)];
+	    while (!snapped && i<snap.length) {
+		if (snap[i].condition(this)) {
+		    setCoords.top = snap[i].pos;
+		    snapped = true;
+		}
+		i++
 	    }
 	}
-	else if (inRange(coords.bottom,snaps.v[0],this.snapMargin)) {
-	    setCoords.bottom = snaps.v[0];
+	if (!snapped && this._snapY[Math.round(coords.centerY)]) {
+	    i = 0;
+	    snap = this._snapY[Math.round(coords.centerY)];
+	    while (!snapped && i<snap.length) {
+		if (snap[i].condition(this)) {
+		    if (['tl','mt','tr'].includes(e.transform.corner)) {
+			// transforming from top
+			setCoords.top = snap[i].pos - (setCoords.bottom - snap[i].pos);
+		    } else {
+			//transforming from bottom
+			setCoords.bottom = snap[i].pos + (snap[i].pos-setCoords.top);
+		    }
+		    snapped = true;
+		}
+		i++
+	    }
+	}
+	if (this._snapY[Math.round(coords.bottom)]) {
+	    i = 0;
+	    snap = this._snapY[Math.round(coords.bottom)];
+	    while (!snapped && i<snap.length) {
+		if (snap[i].condition(this)) {
+		    setCoords.bottom = snap[i].pos;
+		    snapped = true;
+		}
+		i++
+	    }
 	}	
 
 	// Snap X
-	if (inRange(coords.left,snaps.h[0],this.snapMargin)) {
-	    setCoords.left = snaps.h[0];
-	} else if(inRange(coords.centerX,snaps.h[0],this.snapMargin)) {
-	    if (['tl','ml','bl'].includes(e.transform.corner)) {
-		// transforming from left
-		setCoords.left = snaps.h[0] - (setCoords.right - snaps.h[0]);
-	    } else {
-		//transforming from bottom
-		setCoords.right = snaps.h[0] + (snaps.h[0]-setCoords.left);
+	snapped = false;
+	if (this._snapY[Math.round(coords.left)]) {
+	    i = 0;
+	    snap = this._snapY[Math.round(coords.left)];
+	    while (!snapped && i<snap.length) {
+		if (snap[i].condition(this)) {
+		    setCoords.left = snap[i].pos;
+		    snapped = true;
+		}
+		i++
 	    }
 	}
-	else if (inRange(coords.right,snaps.h[0],this.snapMargin)) {
-	    setCoords.right = snaps.v[0];
+	if (!snapped && this._snapY[Math.round(coords.centerX)]) {
+	    i = 0;
+	    snap = this._snapY[Math.round(coords.centerX)];
+	    while (!snapped && i<snap.length) {
+		if (snap[i].condition(this)) {
+		    if (['tl','ml','bl'].includes(e.transform.corner)) {
+			// transforming from left
+			setCoords.left = snap[i].pos - (setCoords.right - snap[i].pos);
+		    } else {
+			//transforming from right
+			setCoords.right = snap[i].pos + (snap[i].pos-setCoords.left);
+		    }
+		    snapped = true;
+		}
+		i++
+	    }
+	}
+	if (this._snapY[Math.round(coords.right)]) {
+	    i = 0;
+	    snap = this._snapY[Math.round(coords.right)];
+	    while (!snapped && i<snap.length) {
+		if (snap[i].condition(this)) {
+		    setCoords.right = snap[i].pos;
+		    snapped = true;
+		}
+		i++
+	    }
 	}	
+
 
 	this.setByBoundingCoords(setCoords);
 
