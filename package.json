@@ -1,5 +1,5 @@
 {
-    "name": "fabricPublisherTools",
+    "name": "@mtrudw/fabricPublisherTools",
     "version": "0.1.0",
     "main": "dist/fabricPublisherTools.min.js",
     "license": "MIT",
