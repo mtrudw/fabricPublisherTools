@@ -10,35 +10,65 @@ function fabricAddSmartGuides() {
         fabricAddSnapper();
     }
 
-    function renderHorizontal(bounds,center) {
-        return (target) => {
-            var coords ={left:0,right:0,color:'red'}
-            var targetBounds = target.getBoundingCoords();
-
-            if (center) {
-                coords.left = Math.min(targetBounds.centerX,bounds.centerX);
-                coords.right = Math.max(targetBounds.centerX,bounds.centerX);
+    function renderHorizontal(bounds,key) {
+        return (target,ctx) => {
+            var left=0,right=0,color='red',
+                targetBounds = target.getBoundingCoords(),
+                compare = bounds[key];
+            if (0.1 >= Math.abs(compare - targetBounds.centerY)) {
+                left = Math.min(targetBounds.centerX,bounds.centerX);
+                right = Math.max(targetBounds.centerX,bounds.centerX);
+                color = 'blue';
             } else {
-                coords.left = Math.min(targetBounds.left,bounds.left);
-                coords.right = Math.max(targetBounds.right,bounds.right);
+                left = Math.min(targetBounds.left,bounds.left);
+                right = Math.max(targetBounds.right,bounds.right);
             }
-            return coords;
+
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(left,bounds[key]);
+            ctx.lineTo(right,bounds[key]);
+            ctx.stroke();
         }
     }
 
-    function renderVertical(bounds,center) {
-        return (target) => {
-            var coords ={top:0,bottom:0,color:'red'}
-            var targetBounds = target.getBoundingCoords();
-
-            if (center) {
-                coords.top = Math.min(targetBounds.centerY,bounds.centerY);
-                coords.bottom = Math.max(targetBounds.centerY,bounds.centerY);
+    function renderVertical(bounds,key) {
+        return (target,ctx) => {
+            var top= 0,bottom=0,color='red',
+                targetBounds = target.getBoundingCoords(),
+                compare = bounds[key]
+            if (0.1> Math.abs(compare -targetBounds.centerX)) {
+                top = Math.min(targetBounds.centerY,bounds.centerY);
+                bottom = Math.max(targetBounds.centerY,bounds.centerY);
+                color = 'blue';
             } else {
-                coords.top = Math.min(targetBounds.top,bounds.top);
-                coords.bottom = Math.max(targetBounds.bottom,bounds.bottom);
+                top = Math.min(targetBounds.top,bounds.top);
+                bottom = Math.max(targetBounds.bottom,bounds.bottom);
             }
-            return coords;
+
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(bounds[key],top);
+            ctx.lineTo(bounds[key],bottom);
+            ctx.stroke();
+        }
+    }
+
+    function renderCanvasLine(direction,canvas) {
+        return (target,ctx) => {
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = 'green';
+            ctx.beginPath();
+            if ('x' == direction) {
+                ctx.moveTo(canvas.width/2,0)
+                ctx.lineTo(canvas.width/2,canvas.height)
+            } else if ('y' == direction) {
+                ctx.moveTo(0,canvas.height/2)
+                ctx.lineTo(canvas.width,canvas.height/2)
+            }
+            ctx.stroke();
         }
     }
     
@@ -51,7 +81,8 @@ function fabricAddSmartGuides() {
             bounds,
             snapper,
             snappers = [];
-            
+
+        // Objects
         for (var i = canvasObjects.length; i--;) {
             var obj = canvasObjects[i];
             bounds = obj.getBoundingCoords();
@@ -61,7 +92,7 @@ function fabricAddSmartGuides() {
                             'validTarget': valid(obj),
                             'condition': () => {return true},
                             'margin': 10,
-                            'renderActive': renderHorizontal(bounds, 'centerY' == key),
+                            'renderActive': renderHorizontal(bounds, key),
                           };
                 snappers.push(snapper);
             });
@@ -70,12 +101,29 @@ function fabricAddSmartGuides() {
                             'validTarget': valid(obj),
                             'condition': () => {return true},
                             'margin': 10,
-                            'renderActive': renderVertical(bounds, 'centerX' == key),
+                            'renderActive': renderVertical(bounds, key),
                           };
                 snappers.push(snapper);
             });
 
         }
+        // Canvas
+
+        snappers.push({
+            'x': this.width/2,
+            'validTarget': () => {return true},
+            'condition' : () => {return true},
+            'margin' : 10,
+            'renderActive' : renderCanvasLine('x',this)
+        });
+        snappers.push({
+            'y': this.height/2,
+            'validTarget': () => {return true},
+            'condition' : () => {return true},
+            'margin' : 10,
+            'renderActive' : renderCanvasLine('y',this)
+        });
+        
         return snappers;
 
     }
