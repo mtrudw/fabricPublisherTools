@@ -13,7 +13,12 @@ with the canvas.
 Create guides to snap to on both move and scale. Snaps to bounding box when rotated. Rotated objects don't snap reliably on scale yet.
 
 ### Smart aligning Guides
-Snap into alignment with other objects on move and scale. Shows aligned edges.
+Snap into alignment with other objects and the canvas center on move and scale. Shows guides aligned edges.
+![](https://mtrudw.github.io/fabricPublisherTools/smartguides.gif)
+
+Problems:
+- Only moving works nicely with rotated objects
+- Keeps stroke width constant on scaling (I consider it a bonus, might be a problem in certain cases though)
 
 ## Image Container
 Image container that allows independent scaling of container and image. Keeps image clipped to container
