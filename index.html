@@ -6,11 +6,11 @@
   <body>
 
     <h1> Smart Guides </h1>
-    Move to align with other objects
+    Move and scale to align with other objects
     <canvas id="c4" width="800" height="800">
     </canvas>
     <script type="module">
-      import {fabricAddSnapper,fabricAddSmartGuides} from 'https://cdn.jsdelivr.net/gh/mtrudw/fabricPublisherTools/dist/fabricPublisherTools.js';
+      import {fabricAddSnapper,fabricAddSmartGuides} from 'https://cdn.jsdelivr.net/gh/mtrudw/fabricPublisherTools/dist/fabricPublisherTools.min.js';
       fabricAddSnapper();
       fabricAddSmartGuides();
       var canvas = new fabric.Canvas('c4');
@@ -30,7 +30,7 @@
     <canvas id="c3" width="800" height="800">
     </canvas>
     <script type="module">
-      import {fabricAddSnapper} from 'https://cdn.jsdelivr.net/gh/mtrudw/fabricPublisherTools/dist/fabricPublisherTools.js';
+      import {fabricAddSnapper} from 'https://cdn.jsdelivr.net/gh/mtrudw/fabricPublisherTools/dist/fabricPublisherTools.min.js';
       fabricAddSnapper();
       var canvas = new fabric.Canvas('c3');
        function makeLine(coords) {
@@ -77,7 +77,7 @@
     <canvas id="c5" width="800" height="800">
     </canvas>
     <script type="module">
-      import {ImageContainer} from 'https://cdn.jsdelivr.net/gh/mtrudw/fabricPublisherTools/dist/fabricPublisherTools.js';
+      import {ImageContainer} from 'https://cdn.jsdelivr.net/gh/mtrudw/fabricPublisherTools/dist/fabricPublisherTools.min.js';
       var canvas = new fabric.Canvas('c5');
       var imgContainer = new fabric.ImageContainer({ left: 100,
 						     right: 100,
@@ -100,7 +100,7 @@
     <button id="delete">Delete</button>
      <script type="module">
 
-       import {fabricAddObjectIDs, fabricAddUndoRedo} from 'https://cdn.jsdelivr.net/gh/mtrudw/fabricPublisherTools/dist/fabricPublisherTools.js';
+       import {fabricAddObjectIDs, fabricAddUndoRedo} from 'https://cdn.jsdelivr.net/gh/mtrudw/fabricPublisherTools/dist/fabricPublisherTools.min.js';
        fabricAddObjectIDs()
        fabricAddUndoRedo();
        var canvas1 = new fabric.Canvas('c1');
