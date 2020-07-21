@@ -50,7 +50,7 @@ function fabricAddSnapper() {
             boundHeight = coords.bottom-coords.top,
             boundWidth = coords.right-coords.left;
         var tempStroke = this.strokeWidth;
-	this.strokeWidth = 0;
+        this.strokeWidth = 0;
         coords.centerY = coords.top + (coords.bottom-coords.top)/2;
         coords.centerX = coords.left + (coords.right-coords.left)/2;
         if (0 !== cos2t) {
@@ -245,15 +245,15 @@ function fabricAddSnapper() {
         if (e.target) {
             var object  =this.getObjectById(e.target.id)
             object._prepareSnaps();
-	    object.tempStroke =  object.strokeWidth;
-	    object.strokeWidth = 0;
+            object.tempStroke =  object.strokeWidth;
+            object.strokeWidth = 0;
 
             this._snappedLines.length=0;
         }
     }
 
     fabric.Object.prototype._afterScale = function() {
-	this.strokeWidth = this.tempStroke;
+        this.strokeWidth = this.tempStroke;
     }
     
     fabric.Object.prototype._snapScale = function(e) {
@@ -269,7 +269,7 @@ function fabricAddSnapper() {
             while (!snapped && i<snap.length) {
                 if (snap[i].condition(this)) {
                     setCoords.top = snap[i].pos;
-		    snapped = true;
+                    snapped = true;
                 }
                 i++
             }
@@ -293,7 +293,7 @@ function fabricAddSnapper() {
         }
         if (this._snapY[Math.round(coords.bottom)]) {
             i = 0;
-	    snapped = false;
+            snapped = false;
             snap = this._snapY[Math.round(coords.bottom)];
             while (!snapped && i<snap.length) {
                 if (snap[i].condition(this)) {
@@ -336,7 +336,7 @@ function fabricAddSnapper() {
         }
         if (this._snapY[Math.round(coords.right)]) {
             i = 0;
-	    snapped = false;
+            snapped = false;
             snap = this._snapY[Math.round(coords.right)];
             while (!snapped && i<snap.length) {
                 if (snap[i].condition(this)) {
@@ -396,7 +396,7 @@ function fabricAddSnapper() {
     fabric.Object.prototype.doesSnap = function() {
         this.on({'moving':this._snapMove,
                  'scaling': this._snapScale,
-		 'scaled':this._afterScale});
+                 'scaled':this._afterScale});
     }
 
 }

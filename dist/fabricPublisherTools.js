@@ -30102,12 +30102,10 @@ function fabricAddSnapper() {
     fabric_1.fabric.Object.prototype._snapY = [];
     fabric_1.fabric.Canvas.prototype._snappedLines = [];
     
-    fabric_1.fabric.Object.prototype.getBoundingCoords = function(calc) {
+    fabric_1.fabric.Object.prototype.getBoundingCoords = function() {
         var tempStroke = this.strokeWidth;
         this.strokeWidth = 0;
-        if (calc) {
-            this.setCoords();
-        }
+        this.setCoords();
         var center = this.getCenterPoint();
 
         var bounds = {'left': Math.min(this.aCoords.tl.x,this.aCoords.tr.x,this.aCoords.bl.x,this.aCoords.br.x),
@@ -30137,6 +30135,7 @@ function fabricAddSnapper() {
             boundHeight = coords.bottom-coords.top,
             boundWidth = coords.right-coords.left;
         var tempStroke = this.strokeWidth;
+        this.strokeWidth = 0;
         coords.centerY = coords.top + (coords.bottom-coords.top)/2;
         coords.centerX = coords.left + (coords.right-coords.left)/2;
         if (0 !== cos2t) {
@@ -30149,7 +30148,7 @@ function fabricAddSnapper() {
             this.scaleX = aspect *calcHeight / this.width;
         }
 
-        this.strokeWidth = 0;
+
 
         this.setCoords();
         this.setPositionByOrigin(new fabric_1.fabric.Point(coords.centerX, coords.centerY),'center','center');
@@ -30196,7 +30195,7 @@ function fabricAddSnapper() {
                         if (!this._snapX[k]) {
                             this._snapX[k] = [snapObj];
                         } else {
-                            this._snapX[k].push([snapObj]);
+                            this._snapX[k].push(snapObj);
                         }
                     }
                 } else {
@@ -30218,8 +30217,7 @@ function fabricAddSnapper() {
         ['top', 'centerY', 'bottom'].forEach((key) => {
             if (this._snapY[Math.round(coords[key])]) {
                 this._snapY[Math.round(coords[key])].forEach((obj) =>{
-                    if (Math.abs(obj.pos - coords[key])<2) {
-                        obj.direction = 'h';
+                    if (Math.abs(obj.pos - coords[key])<0.1) {
                         this.canvas._snappedLines.push(obj);
                     }               
                 });
@@ -30229,8 +30227,7 @@ function fabricAddSnapper() {
         ['left', 'centerX', 'right'].forEach((key) => {
             if (this._snapX[Math.round(coords[key])]) {
                 this._snapX[Math.round(coords[key])].forEach((obj) =>{
-                    if (Math.abs(obj.pos - coords[key])<2) {
-                        obj.direction = 'v';
+                    if (Math.abs(obj.pos - coords[key])<0.1) {
                         this.canvas._snappedLines.push(obj);
                     }
                 });
@@ -30240,7 +30237,7 @@ function fabricAddSnapper() {
 
     
     fabric_1.fabric.Object.prototype._snapMove = function() {
-        var coords = this.getBoundingCoords(true),
+        var coords = this.getBoundingCoords(),
             height = coords.bottom - coords.top,
             width = coords.right-coords.left,
             setCoords = coords,
@@ -30333,17 +30330,23 @@ function fabricAddSnapper() {
         if (e.target) {
             var object  =this.getObjectById(e.target.id);
             object._prepareSnaps();
+            object.tempStroke =  object.strokeWidth;
+            object.strokeWidth = 0;
+
+            this._snappedLines.length=0;
         }
     };
 
+    fabric_1.fabric.Object.prototype._afterScale = function() {
+        this.strokeWidth = this.tempStroke;
+    };
     
     fabric_1.fabric.Object.prototype._snapScale = function(e) {
-        var coords = this.getBoundingCoords(true),
+        var coords = this.getBoundingCoords(),
             setCoords = coords,
             snap,
             snapped = false,
             i;
-        
         // Snap Y
         if (this._snapY[Math.round(coords.top)]) {
             i = 0;
@@ -30375,6 +30378,7 @@ function fabricAddSnapper() {
         }
         if (this._snapY[Math.round(coords.bottom)]) {
             i = 0;
+            snapped = false;
             snap = this._snapY[Math.round(coords.bottom)];
             while (!snapped && i<snap.length) {
                 if (snap[i].condition(this)) {
@@ -30417,6 +30421,7 @@ function fabricAddSnapper() {
         }
         if (this._snapY[Math.round(coords.right)]) {
             i = 0;
+            snapped = false;
             snap = this._snapY[Math.round(coords.right)];
             while (!snapped && i<snap.length) {
                 if (snap[i].condition(this)) {
@@ -30437,37 +30442,17 @@ function fabricAddSnapper() {
      */
     fabric_1.fabric.Canvas.prototype._renderActiveGuides = function() {
         var ctx = this.getSelectionContext();
-        function drawLine(x1, y1, x2, y2, color) {
-            ctx.save();
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = color;
-            ctx.beginPath();
-            ctx.moveTo(x1, y1);
-            ctx.lineTo(x2,y2);
-            ctx.stroke();
-            ctx.restore();
-        }
 
         if (!this.getActiveObject()){
             return;
         }
+
         for (var i = 0 ; i< this._snappedLines.length; i++){
             var render = this._snappedLines[i].renderActive;
             if (render) {
-                if ('h' == this._snappedLines[i].direction){
-                    var lr = render(this.getActiveObject());
-                    if (lr.left && lr.right) {
-                        var y = this._snappedLines[i].pos;
-                        drawLine(lr.left,y,lr.right,y, lr.color? lr.color: 'green');
-                    }
-                } else if ('v' == this._snappedLines[i].direction){
-                    var tb = render(this.getActiveObject());
-                    if (tb.top && tb.bottom) {
-                        var x = this._snappedLines[i].pos;
-                        drawLine(x,lr.top,x,lr.bottom, lr.color? lr.color: 'green');
-                    }
-                }
-
+                ctx.save();
+                render(this.getActiveObject(),ctx);
+                ctx.restore();
             }
         }
         
@@ -30495,7 +30480,8 @@ function fabricAddSnapper() {
      */
     fabric_1.fabric.Object.prototype.doesSnap = function() {
         this.on({'moving':this._snapMove,
-                 'scaling': this._snapScale});
+                 'scaling': this._snapScale,
+                 'scaled':this._afterScale});
     };
 
 }
@@ -30509,35 +30495,65 @@ function fabricAddSmartGuides() {
         fabricAddSnapper();
     }
 
-    function renderHorizontal(bounds,center) {
-        return (target) => {
-            var coords ={left:0,right:0,color:'red'};
-            var targetBounds = target.getBoundingCoords();
-
-            if (center) {
-                coords.left = Math.min(targetBounds.centerX,bounds.centerX);
-                coords.right = Math.max(targetBounds.centerX,bounds.centerX);
+    function renderHorizontal(bounds,key) {
+        return (target,ctx) => {
+            var left=0,right=0,color='red',
+                targetBounds = target.getBoundingCoords(),
+                compare = bounds[key];
+            if (0.1 >= Math.abs(compare - targetBounds.centerY)) {
+                left = Math.min(targetBounds.centerX,bounds.centerX);
+                right = Math.max(targetBounds.centerX,bounds.centerX);
+                color = 'blue';
             } else {
-                coords.left = Math.min(targetBounds.left,bounds.left);
-                coords.right = Math.max(targetBounds.right,bounds.right);
+                left = Math.min(targetBounds.left,bounds.left);
+                right = Math.max(targetBounds.right,bounds.right);
             }
-            return coords;
+
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(left,bounds[key]);
+            ctx.lineTo(right,bounds[key]);
+            ctx.stroke();
         }
     }
 
-    function renderVertical(bounds,center) {
-        return (target) => {
-            var coords ={top:0,bottom:0,color:'red'};
-            var targetBounds = target.getBoundingCoords();
-
-            if (center) {
-                coords.top = Math.min(targetBounds.centerY,bounds.centerY);
-                coords.bottom = Math.max(targetBounds.centerY,bounds.centerY);
+    function renderVertical(bounds,key) {
+        return (target,ctx) => {
+            var top= 0,bottom=0,color='red',
+                targetBounds = target.getBoundingCoords(),
+                compare = bounds[key];
+            if (0.1> Math.abs(compare -targetBounds.centerX)) {
+                top = Math.min(targetBounds.centerY,bounds.centerY);
+                bottom = Math.max(targetBounds.centerY,bounds.centerY);
+                color = 'blue';
             } else {
-                coords.top = Math.min(targetBounds.top,bounds.top);
-                coords.bottom = Math.max(targetBounds.bottom,bounds.bottom);
+                top = Math.min(targetBounds.top,bounds.top);
+                bottom = Math.max(targetBounds.bottom,bounds.bottom);
             }
-            return coords;
+
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(bounds[key],top);
+            ctx.lineTo(bounds[key],bottom);
+            ctx.stroke();
+        }
+    }
+
+    function renderCanvasLine(direction,canvas) {
+        return (target,ctx) => {
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = 'green';
+            ctx.beginPath();
+            if ('x' == direction) {
+                ctx.moveTo(canvas.width/2,0);
+                ctx.lineTo(canvas.width/2,canvas.height);
+            } else if ('y' == direction) {
+                ctx.moveTo(0,canvas.height/2);
+                ctx.lineTo(canvas.width,canvas.height/2);
+            }
+            ctx.stroke();
         }
     }
     
@@ -30550,7 +30566,8 @@ function fabricAddSmartGuides() {
             bounds,
             snapper,
             snappers = [];
-            
+
+        // Objects
         for (var i = canvasObjects.length; i--;) {
             var obj = canvasObjects[i];
             bounds = obj.getBoundingCoords();
@@ -30560,7 +30577,7 @@ function fabricAddSmartGuides() {
                             'validTarget': valid(obj),
                             'condition': () => {return true},
                             'margin': 10,
-                            'renderActive': renderHorizontal(bounds, 'centerY' == key),
+                            'renderActive': renderHorizontal(bounds, key),
                           };
                 snappers.push(snapper);
             });
@@ -30569,12 +30586,29 @@ function fabricAddSmartGuides() {
                             'validTarget': valid(obj),
                             'condition': () => {return true},
                             'margin': 10,
-                            'renderActive': renderVertical(bounds, 'centerX' == key),
+                            'renderActive': renderVertical(bounds, key),
                           };
                 snappers.push(snapper);
             });
 
         }
+        // Canvas
+
+        snappers.push({
+            'x': this.width/2,
+            'validTarget': () => {return true},
+            'condition' : () => {return true},
+            'margin' : 10,
+            'renderActive' : renderCanvasLine('x',this)
+        });
+        snappers.push({
+            'y': this.height/2,
+            'validTarget': () => {return true},
+            'condition' : () => {return true},
+            'margin' : 10,
+            'renderActive' : renderCanvasLine('y',this)
+        });
+        
         return snappers;
 
     };
