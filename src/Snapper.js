@@ -106,6 +106,10 @@ function fabricAddSnapper() {
                 }
                 var k;
                 if (snap.x) {
+                    if (0 > snap.x || this.canvas.width < snap.x) {
+                        continue;
+
+                    }
                     for (k = Math.floor(snap.x - snap.margin/2); k<Math.ceil(snap.x + snap.margin/2); k++) {
                         if (!this._snapX[k]) {
                             this._snapX[k] = [snapObj];
@@ -114,6 +118,9 @@ function fabricAddSnapper() {
                         }
                     }
                 } else {
+                    if (0 > snap.y || this.canvas.height < snap.y) {
+                        continue;
+                    }
                     for (k = Math.floor(snap.y - snap.margin/2); k<Math.ceil(snap.y + snap.margin/2); k++) {
                         if (!this._snapY[k]) {
                             this._snapY[k] = [snapObj];
@@ -132,7 +139,7 @@ function fabricAddSnapper() {
         ['top', 'centerY', 'bottom'].forEach((key) => {
             if (this._snapY[Math.round(coords[key])]) {
                 this._snapY[Math.round(coords[key])].forEach((obj) =>{
-                    if (Math.abs(obj.pos - coords[key])<0.1) {
+                    if (Math.abs(obj.pos - coords[key])<0.1 && obj.condition(this)) {
                         this.canvas._snappedLines.push(obj);
                     }               
                 });
@@ -142,7 +149,7 @@ function fabricAddSnapper() {
         ['left', 'centerX', 'right'].forEach((key) => {
             if (this._snapX[Math.round(coords[key])]) {
                 this._snapX[Math.round(coords[key])].forEach((obj) =>{
-                    if (Math.abs(obj.pos - coords[key])<0.1) {
+                    if (Math.abs(obj.pos - coords[key])<0.1 && obj.condition(this)) {
                         this.canvas._snappedLines.push(obj);
                     }
                 });
