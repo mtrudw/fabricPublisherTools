@@ -9,11 +9,16 @@ function fabricAddSmartDistance() {
         fabricAddSnapper()
     }
 
-    var margin = 30,
+    var margin = 10,
         requireIntersect = true;
     
     /**
-     * Check for Obstructions while enforcing, that obj1 is left or top of obj2
+     * Check for obstructions while enforcing, that obj1 is left or top of obj2
+     * @function noObstruction
+     * @param {fabric.Object} obj1 first fabric Object from top/left
+     * @param {fabric.Object} obj2 second fabric Object from top/left
+     * @param {boolean} horizontal check for horizontal Obstructon (if false checks vertical
+     * @param {fabric.Canvas} canvas the fabric.Canvas to check on (should contain obj1 and obj2)
      */
     function noObstruction(obj1, obj2, horizontal, canvas) {
         var intersectRect,
@@ -42,8 +47,16 @@ function fabricAddSmartDistance() {
             }
         }
         return true;
-
     }
+
+    /**
+     * Check if obj1 and obj2 line up either horizontally or vertically
+     * @function inLine
+     * @param {fabric.Object} obj1 first fabric Object
+     * @param {fabric.Object} obj2 second fabric Object
+     * @param {boolean} horizontal check for horizontal Obstructon (if false checks vertical
+     * @param {fabric.Canvas} canvas the fabric.Canvas to check on (should contain obj1 and obj2)
+     */
     function inLine(obj1, obj2, horizontal, canvas) {
         var intersectRect;
         if (horizontal) {
@@ -65,7 +78,8 @@ function fabricAddSmartDistance() {
     }
 
     /**
-     * 
+     * Checks if Snapper should be active. Makes sure the target is neiher one of the objects the original distance is taken from nor 
+     * the object the distance from the snapped object is measured from
      */
     function valid(obj1,obj2,obj) {
         return (o) => {
@@ -74,7 +88,7 @@ function fabricAddSmartDistance() {
         }
     }
     /**
-     * Canvas Bounds Ids: left = -4, top= -3 right = -2, bottom = -1
+     * 
      * 
      */
     function checkCondition(obj1,obj2,target,key,canvas) {
